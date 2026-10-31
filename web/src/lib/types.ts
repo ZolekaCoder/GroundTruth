@@ -39,3 +39,14 @@ export const STANCE_META: Record<Stance, { label: string; color: string; gloss: 
 
 /** Tolerant lookup: an unexpected stance from the model must never crash the room. */
 export const stanceMeta = (s: string) => STANCE_META[s as Stance] ?? STANCE_META.insufficient;
+
+/**
+ * Tolerant list: models sometimes send a list-valued tool argument as a string
+ * (e.g. '["a"], ["b"]'). Accept arrays, stringified lists, or plain lines.
+ */
+export function asList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.flat(3).map(String).filter(Boolean);
+  if (typeof v !== "string" || !v.trim()) return [];
+  for (const attempt of [v, `[${v}]`]) { try { const j = JSON.parse(attempt); if (Array.isArray(j)) return j.flat(3).map(String).filter(Boolean); } catch { /* next */ } }
+  return v.split(/\n|;\s+/).map((x) => x.replace(/^[\s\-•"[\]]+|[\s"[\]]+$/g, "")).filter(Boolean);
+}

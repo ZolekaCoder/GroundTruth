@@ -20,12 +20,9 @@ if (resume) {
   await page.waitForTimeout(12000);
 } else {
   await page.goto("http://localhost:5173/", { waitUntil: "load" });
-  await page.getByRole("button", { name: /Walk into the newsroom/ }).click(T);
-  await page.waitForTimeout(4000);
-  await stations.getByRole("button", { name: "Table", exact: true }).click({ force: true, ...T });
-  await page.waitForTimeout(3000);
-  await page.getByRole("button", { name: /Open the Serbia dossier/ }).click({ force: true, ...T });
-  await page.getByRole("button", { name: "Put it on trial" }).click(T);
+  await page.waitForTimeout(3000); await shot("00-cold-open");
+  // the cold open's second action starts the flagship case live
+  await page.getByRole("button", { name: "Open the Serbia investigation now" }).click(T);
   await page.waitForURL(/case=/, T);
   caseId = new URL(page.url()).searchParams.get("case");
   console.log("LIVE case", caseId);
@@ -50,8 +47,9 @@ await memo.getByRole("button", { name: "Send it to the judge" }).click({ force: 
 
 await page.getByRole("button", { name: "RULING OF THE COURT" }).waitFor(T);
 await page.waitForTimeout(4000); await shot("05-wall-verdict");
-await page.getByRole("button", { name: "RULING OF THE COURT" }).click({ force: true });
-await page.getByRole("button", { name: /Stamp the ruling/ }).click({ force: true });
+await page.getByRole("navigation", { name: "Exhibits on the wall" }).getByRole("button", { name: "RULING OF THE COURT" }).click({ force: true, ...T });
+await page.getByRole("dialog", { name: "Ruling of the court" }).waitFor(T);
+await page.getByRole("button", { name: /Stamp the ruling/ }).click({ force: true, ...T });
 await page.waitForTimeout(1500); await shot("06-ruling");
 
 const k = await (await fetch(`http://localhost:8787/api/cases/${caseId}`)).json();

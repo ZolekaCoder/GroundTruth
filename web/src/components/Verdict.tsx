@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Check, Copy, Loader2, Megaphone } from "lucide-react";
-import { STANCE_META, type Case, type Verdict as V } from "../lib/types";
+import { asList, STANCE_META, type Case, type Verdict as V } from "../lib/types";
 import { EvidenceCard } from "./Ledger";
 
-export function VerdictReveal({ c, v, previous }: { c: Case; v: V; previous?: V }) {
+export function VerdictReveal({ c, v: rawV, previous }: { c: Case; v: V; previous?: V }) {
+  const v = { ...rawV, uncertainties: asList(rawV.uncertainties), framingNotes: asList(rawV.framingNotes), keyEvidenceIds: asList(rawV.keyEvidenceIds) };
   const meta = STANCE_META[v.verdict];
   const [copied, setCopied] = useState(false);
   const share = async () => {
@@ -99,7 +100,7 @@ export function ObjectionForm({ onSubmit, disabled }: { onSubmit: (arg: string, 
       <button disabled={busy || disabled || !arg.trim()} className="mt-3 inline-flex items-center gap-2 bg-red px-5 py-3 font-semibold text-ivory hover:bg-[#d44a3f] disabled:opacity-40">
         {busy ? <Loader2 size={16} className="animate-spin" /> : <Megaphone size={16} />} Raise objection
       </button>
-      {disabled && <p className="mt-2 text-[12.5px] text-mute">Objections are unavailable in the recorded case: they need the live court.</p>}
+      {disabled && <p className="mt-2 text-[12.5px] text-mute">Objections need the live court.</p>}
       {err && <p role="alert" className="mt-2 text-[13px] text-red">{err}</p>}
     </form>
   );

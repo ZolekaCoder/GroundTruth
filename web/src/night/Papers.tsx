@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Check, Copy, ExternalLink, FlaskConical, Loader2, X } from "lucide-react";
 import { DOSSIERS, relativeDay, type Dossier } from "../lib/elections";
-import { stanceMeta, type Advocate, type Case } from "../lib/types";
+import { asList, stanceMeta, type Advocate, type Case } from "../lib/types";
 import { AGENT_LOOK } from "./Workstation";
 
 const fmt = (iso: string) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -23,8 +23,8 @@ export function Sheet({ children, onClose, width = 640, tilt = -0.8, label }: { 
 
 const Label = ({ children, tone = "#6b5a3c" }: { children: React.ReactNode; tone?: string }) => <p className="typed text-[11px] tracking-[.06em]" style={{ color: tone }}>{children}</p>;
 
-export function DossierFolder({ id, onOpenCase, onDemo, onClose, busy, live, error }: {
-  id: Dossier["id"]; onOpenCase: (input: { claim: string; url?: string }) => void; onDemo: () => void; onClose: () => void; busy: boolean; live: boolean | null; error: string | null;
+export function DossierFolder({ id, onOpenCase, onClose, busy, live, error }: {
+  id: Dossier["id"]; onOpenCase: (input: { claim: string; url?: string }) => void; onSerbia?: () => void; onClose: () => void; busy: boolean; live: boolean | null; error: string | null;
 }) {
   const d = DOSSIERS.find((x) => x.id === id)!;
   return (
@@ -57,9 +57,8 @@ export function DossierFolder({ id, onOpenCase, onDemo, onClose, busy, live, err
               className="inline-flex items-center gap-2 bg-[#2b241c] px-5 py-3 text-[14px] font-semibold text-paper transition hover:bg-[#a3302a] disabled:opacity-40">
               {busy && <Loader2 size={15} className="animate-spin" />} Put it on trial
             </button>
-            {d.id === "rs" && <button onClick={onDemo} className="text-[14px] text-[#3d3222] underline underline-offset-4 hover:text-[#a3302a]">Replay the recorded investigation</button>}
           </div>
-          {live === false && <p className="mt-3 text-[12.5px] text-[#8a5a1e]">The live court is offline. The recorded investigation still plays.</p>}
+          {live === false && <p className="mt-3 text-[13px] text-[#a3302a]">The live court is offline: the server has no working model key or credit.</p>}
           {error && <p role="alert" className="mt-3 text-[13px] text-[#a3302a]">{error}</p>}
           <Label tone="#3d3222"><span className="mt-8 block border-b border-[#8a7a5c]/50 pb-1">PRIMARY SOURCES</span></Label>
           <ul className="mt-2 space-y-1.5 text-[14px]">
@@ -238,7 +237,8 @@ export function SourceSheet({ id, c, onClose }: { id: string; c: Case; onClose: 
 
 /** The ruling. The editor stamps it themselves; then it can be copied or reopened by objection. */
 export function VerdictSheet({ c, live, onClose, onObjection }: { c: Case; live: boolean; onClose: () => void; onObjection: (arg: string, url?: string) => Promise<void> }) {
-  const v = c.verdicts.at(-1)!;
+  const raw = c.verdicts.at(-1)!;
+  const v = { ...raw, uncertainties: asList(raw.uncertainties), framingNotes: asList(raw.framingNotes), keyEvidenceIds: asList(raw.keyEvidenceIds) };
   const prev = c.verdicts.at(-2);
   const [stamped, setStamped] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -309,7 +309,7 @@ export function VerdictSheet({ c, live, onClose, onObjection }: { c: Case; live:
         <div className="mt-8 flex flex-wrap gap-3 border-t border-[#8a7a5c]/40 pt-5">
           <button onClick={copy} className="inline-flex items-center gap-2 bg-[#2b241c] px-4 py-2.5 text-[14px] text-paper hover:bg-[#4a3a28]">{copied ? <Check size={15} /> : <Copy size={15} />} {copied ? "Copied" : "Save summary to clipboard"}</button>
           <button onClick={() => setObjecting((o) => !o)} disabled={!live} className="px-4 py-2.5 text-[14px] text-[#a3302a] underline underline-offset-4 disabled:opacity-40">Reopen with an objection</button>
-          {!live && <span className="self-center text-[12px] text-[#6b5a3c]">Objections need the live court; this is a recording.</span>}
+          {!live && <span className="self-center text-[12px] text-[#6b5a3c]">Objections need the live court.</span>}
         </div>
 
         {objecting && (
@@ -334,12 +334,11 @@ const DESKS: { role: Advocate; label: string }[] = [
 ];
 
 /**
- * The editor's memo: the user's decision points. Live, every choice is real and steers the
- * Mozaik agents. In a recording, only the recorded path exists, so the memo shows what was
- * decided (and by whom) and offers to continue.
+ * The editor's memo: the user's decision points. Every choice is real and steers the live
+ * Mozaik agents.
  */
-export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
-  c: Case; live: boolean; onDecide: (d: import("../lib/api").EditorDecision) => Promise<void>; onContinue?: () => void; onClose: () => void;
+export function EditorMemo({ c, live, onDecide, onClose }: {
+  c: Case; live: boolean; onDecide: (d: import("../lib/api").EditorDecision) => Promise<void>; onClose: () => void;
 }) {
   const open = c.leads.filter((l) => l.status === "open");
   const [assign, setAssign] = useState<Record<string, Advocate | undefined>>({});
@@ -352,9 +351,7 @@ export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
   ];
   const run = async (d: import("../lib/api").EditorDecision) => { setBusy(true); setErr(null); try { await onDecide(d); } catch (x) { setErr((x as Error).message); } finally { setBusy(false); } };
   const chal = c.challenges.length, conceded = c.rebuttals.filter((r) => r.concede).length;
-  const recorded = !live;
-  // in a recording, the decision that followed this pause
-  const pauseAt = c.phaseLog.filter((p) => p.phase === "awaiting_editor").at(-1)?.at ?? 0;
+  const recorded = !live; // only if the live stream dropped: decisions need the live court
 
   return (
     <Sheet onClose={onClose} label="Editor's decision" width={720} tilt={0.5}>
@@ -367,14 +364,6 @@ export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
             : `Cross-examination is done: ${chal} challenge${chal === 1 ? "" : "s"}, ${conceded} conceded. Send it to the judge, or send someone back out first.`}
         </p>
 
-        {recorded && (
-          <div className="mt-4 bg-white/60 p-4" style={{ boxShadow: "0 2px 6px rgba(60,40,20,.15)" }}>
-            <p className="typed text-[12.5px] text-[#7a4e16]">RECORDED DECISION{c.autopilot ? " · TAKEN BY THE TEST AUTOPILOT, NOT A PERSON" : ""}</p>
-            <p className="mt-1 text-[14.5px]">{c.decisions.find((d) => d.at >= pauseAt)?.detail ?? "Continue to see what was decided."}</p>
-            <p className="mt-1 max-w-[68ch] text-[14px] text-[#4a3d2a]">A recording can only follow the path that was actually taken. Open a live case to make this call yourself.</p>
-            <button onClick={onContinue} className="mt-3 bg-[#2b241c] px-5 py-2.5 text-[14px] font-semibold text-paper hover:bg-[#2f5f63]">Continue the recording</button>
-          </div>
-        )}
 
         {(afterInvestigation || open.length > 0) && (
           <ul className="mt-5 space-y-3">

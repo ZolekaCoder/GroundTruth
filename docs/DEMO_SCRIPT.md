@@ -7,7 +7,7 @@
 > "Observers said bias and online manipulation hampered Serbian voters' access to reliable information. Every line here is a verbatim quote, linked to its source."
 
 **0:16 — The test claim.** Point at the *Synthetic test claim* label.
-> "We wrote this claim to test the court. It uses the observers' real words about high turnout, and leaves out the rest. Let's put it on trial." Click **Open the investigation**, or **Watch the recorded investigation** if offline.
+> "We wrote this claim to test the court. It uses the observers' real words about high turnout, and leaves out the rest. Let's put it on trial." Click **Open the investigation**.
 
 **0:22 — CASE OPENED.** The stamp lands; three agents light up.
 > "One event, three Mozaik agents, three independent loops, all starting at the same instant. The timeline is drawn from Mozaik's own events."

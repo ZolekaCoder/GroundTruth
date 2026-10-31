@@ -21,12 +21,6 @@ export function Room({ c, live, lost, onObjection, onRestart }: { c: Case; live:
 
   return (
     <main className="mx-auto max-w-[1380px] px-4 pb-24 sm:px-8">
-      {!live && (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border border-gold/60 px-4 py-2 text-[13px] text-gold" role="note">
-          <span><strong className="font-semibold">Recorded investigation.</strong> A real, unedited run of the four Mozaik agents{c.openedAt ? `, recorded ${new Date(c.openedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}` : ""}, replayed at 4× speed. Nothing on this page is generated in your browser.</span>
-          {onRestart && <button onClick={onRestart} className="inline-flex items-center gap-1.5 hover:text-ivory"><RotateCcw size={13} /> Replay</button>}
-        </div>
-      )}
       {lost && live && <div className="mt-4 flex items-center gap-2 border border-red/60 px-4 py-2 text-[13px] text-red" role="alert"><WifiOff size={14} /> Connection to the court lost. Reconnecting…</div>}
 
       <section className="grid gap-6 pt-8 lg:grid-cols-[1fr_auto] lg:items-end">

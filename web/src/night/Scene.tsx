@@ -30,15 +30,14 @@ const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }
 
 const reduceMotion = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, onOpenCase, onDemo, onObjection, onRestartReplay, onTextView, replayT, replayPaused, onResume }: {
+export function Scene({ mode = "2d", c, live, busy, error, liveCourt, onOpenCase, onSerbia, onObjection, onTextView }: {
   mode?: "2d" | "3d";
-  c: Case | null; live: boolean; recorded: boolean; busy: boolean; error: string | null; liveCourt: boolean | null;
-  replayT?: number; replayPaused?: boolean; onResume?: () => void;
-  onOpenCase: (input: { claim?: string; url?: string }) => Promise<boolean>; onDemo: () => void;
-  onObjection: (arg: string, url?: string) => Promise<void>; onRestartReplay?: () => void; onTextView?: () => void;
+  c: Case | null; live: boolean; busy: boolean; error: string | null; liveCourt: boolean | null;
+  onOpenCase: (input: { claim?: string; url?: string }) => Promise<boolean>; onSerbia: () => Promise<boolean>;
+  onObjection: (arg: string, url?: string) => Promise<void>; onTextView?: () => void;
 }) {
   const [focus, setFocus] = useState<Focus>(() => {
-    try { return mode === "3d" && !c && !recorded && !sessionStorage.getItem("gt-intro-seen") ? "intro" : "overview"; } catch { return "overview"; }
+    try { return mode === "3d" && !c && !sessionStorage.getItem("gt-intro-seen") ? "intro" : "overview"; } catch { return "overview"; }
   });
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [vp, setVp] = useState({ w: innerWidth, h: innerHeight });
@@ -46,12 +45,12 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
   const [toast, setToast] = useState<string | null>(null);
   const verdictCount = useRef(c?.verdicts.length ?? 0);
   // the opening: shown on arrival at the empty newsroom, once per session
-  const [intro, setIntro] = useState(() => { try { return !c && !recorded && !sessionStorage.getItem("gt-intro-seen"); } catch { return !c && !recorded; } });
+  const [intro, setIntro] = useState(() => { try { return !c && !sessionStorage.getItem("gt-intro-seen"); } catch { return !c; } });
   const closeIntro = () => { setIntro(false); setFocus("overview"); try { sessionStorage.setItem("gt-intro-seen", "1"); } catch { /* private mode */ } };
-  // the room's clock: real time for a live case, the replay's own clock for a recording
+  // the room's clock: real time
   const [tick, setTick] = useState(Date.now());
   useEffect(() => { if (!live) return; const iv = setInterval(() => setTick(Date.now()), 400); return () => clearInterval(iv); }, [live]);
-  const now = recorded ? replayT ?? 0 : tick;
+  const now = tick;
   // the editor's decision points: walk to the wall and put the memo on the desk
   const pauseKey = c?.phase === "awaiting_editor" ? `${c.id}:${c.phaseLog.filter((p) => p.phase === "awaiting_editor").length}` : null;
   useEffect(() => {
@@ -185,22 +184,16 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
           )}
         </div>
         <div className="pointer-events-auto flex max-w-[60vw] flex-col items-end gap-2">
-          {recorded ? (
-            <div className="hint flex items-center justify-end gap-2 whitespace-nowrap bg-[#e8dcbf] px-3 py-1.5 text-[#2b241c]" style={{ boxShadow: "0 4px 10px rgba(0,0,0,.4)" }}>
-              <strong className="font-semibold">Recorded investigation</strong>
-              <span className="typed hidden whitespace-nowrap text-[13px] lg:inline">real run · {c ? new Date(c.openedAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""} · {replayPaused ? "paused at a decision" : "replay"}{c?.autopilot ? " · decisions by autopilot" : ""}</span>
-              {onRestartReplay && <button onClick={onRestartReplay} className="inline-flex items-center gap-1 underline"><RotateCcw size={12} /> Replay</button>}
-            </div>
-          ) : c ? (
+          {c ? (
             <div className="hint flex items-center gap-2 rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper">
               {c.phase !== "verdict" && c.phase !== "failed" && <Radio size={13} className="animate-pulse text-[#e6a95c]" />}
               Live case · {c.phase === "awaiting_editor" ? "waiting for your decision" : c.phase.replace("_", "-")}{working ? ` · ${working} agents working` : ""}
             </div>
           ) : (
-            liveCourt === false ? <div className="hint rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper">Live court offline · recordings only</div> : null
+            liveCourt === false ? <div className="hint rounded-full bg-[#a3302a] px-3 py-1.5 text-white">Live court offline: no model key or credit</div> : null
           )}
           {synthetic && <div className="hint bg-[#1b1611]/85 px-3 py-1 text-[#e6c48f]">Synthetic test claim<span className="hidden sm:inline"> ({synthetic.country} dossier), not attributed to anyone</span></div>}
-          {mode === "2d" && <a href={(() => { const p = new URLSearchParams(location.search); p.delete("view"); const q = p.toString().replace("demo=", "demo"); return q ? `?${q}` : "/"; })()} className="hint hidden rounded-full bg-[#1b1611]/85 px-3 py-1 text-paper hover:underline sm:inline">3D view</a>}
+          {mode === "2d" && <a href={(() => { const p = new URLSearchParams(location.search); p.delete("view"); const q = p.toString(); return q ? `?${q}` : "/"; })()} className="hint hidden rounded-full bg-[#1b1611]/85 px-3 py-1 text-paper hover:underline sm:inline">3D view</a>}
         </div>
       </header>
 
@@ -231,7 +224,7 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
             <>
               <span className="mx-1 w-px self-stretch bg-white/20" aria-hidden />
               {c && onTextView && <button onClick={onTextView} className="hint rounded-sm px-2.5 py-2 text-[15px] text-paper hover:bg-white/10">Text</button>}
-              <a href={(() => { const p = new URLSearchParams(location.search); p.set("view", "2d"); return `?${p.toString().replace("demo=", "demo")}`; })()} className="hint rounded-sm px-2.5 py-2 text-[15px] text-paper hover:bg-white/10">2D</a>
+              <a href={(() => { const p = new URLSearchParams(location.search); p.set("view", "2d"); return `?${p.toString()}`; })()} className="hint rounded-sm px-2.5 py-2 text-[15px] text-paper hover:bg-white/10">2D</a>
             </>
           )}
         </nav>
@@ -242,16 +235,15 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
           {c.verdicts.length > 0 && <button onClick={() => setOverlay({ kind: "verdict" })} aria-label="RULING OF THE COURT" className="typed rounded-sm bg-[#a3302a] px-2.5 py-1.5 text-[15px] text-white">Ruling</button>}
         </nav>
       )}
-      <AnimatePresence>{intro && !c && <Intro onEnter={closeIntro} onDemo={() => { closeIntro(); onDemo(); }} />}</AnimatePresence>
+      <AnimatePresence>{intro && !c && <Intro busy={busy} live={liveCourt} error={error} onEnter={closeIntro} onSerbia={async () => { if (await onSerbia()) closeIntro(); }} />}</AnimatePresence>
       {/* documents */}
       <div className={`pointer-events-none absolute inset-0 flex items-center p-4 ${wide ? "justify-end pr-8" : "justify-center"}`}>
         <AnimatePresence mode="wait">
           {overlay?.kind === "editor" && c && c.phase === "awaiting_editor" && (
             <EditorMemo key={`ed-${pauseKey}`} c={c} live={live} onClose={() => setOverlay(null)}
-              onContinue={() => { onResume?.(); setOverlay(null); setFocus("overview"); }}
               onDecide={async (d: EditorDecision) => { await decide(c.id, d); setOverlay(null); setFocus("overview"); setToast(d.action === "call_judge" ? "Sent to the judge." : d.action === "proceed" ? "Straight to cross-examination." : "The desks are on it."); }} />
           )}
-          {overlay?.kind === "dossier" && <DossierFolder key={`d-${overlay.id}`} id={overlay.id} busy={busy} live={liveCourt} error={error} onClose={() => setOverlay(null)} onOpenCase={openCase} onDemo={() => { onDemo(); go("overview"); }} />}
+          {overlay?.kind === "dossier" && <DossierFolder key={`d-${overlay.id}`} id={overlay.id} busy={busy} live={liveCourt} error={error} onClose={() => setOverlay(null)} onOpenCase={openCase} onSerbia={async () => { if (await onSerbia()) go("overview"); }} />}
           {overlay?.kind === "case" && <CaseSheet key="case" c={c} busy={busy} live={liveCourt} error={error} onClose={() => setOverlay(null)} onOpenCase={openCase} />}
           {overlay?.kind === "agent" && <AgentFile key={`a-${overlay.role}`} role={overlay.role} c={c} onClose={() => setOverlay(null)} onEvidence={(id) => go("wall", { kind: "evidence", id })} />}
           {overlay?.kind === "evidence" && c && <EvidenceSheet key={`e-${overlay.id}`} id={overlay.id} c={c} onClose={() => setOverlay(null)} />}
@@ -277,7 +269,7 @@ function Tag({ x, y, text, small }: { x: number; y: number; text: string; small?
  * overlay is a broadcast frame (letterbox, a live bug, a lower third), not a landing page. Entering
  * retracts the frame while the camera dollies back into the room.
  */
-function Intro({ onEnter, onDemo }: { onEnter: () => void; onDemo: () => void }) {
+function Intro({ onEnter, onSerbia, busy, live, error }: { onEnter: () => void; onSerbia: () => void; busy: boolean; live: boolean | null; error: string | null }) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => { const iv = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(iv); }, []);
   useEffect(() => { const k = (e: KeyboardEvent) => { if (e.key === "Enter") onEnter(); }; addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [onEnter]);
@@ -307,8 +299,10 @@ function Intro({ onEnter, onDemo }: { onEnter: () => void; onDemo: () => void })
           <button onClick={onEnter} className="group inline-flex items-center gap-3 bg-[#f7f1e3] px-5 py-3 text-[17px] font-semibold text-[#111] hover:bg-[#f0c35a]">
             Walk into the newsroom <span className="font-mono text-[13px] text-[#555] group-hover:text-[#111]">↵</span>
           </button>
-          <button onClick={onDemo} className="text-[17px] text-white underline decoration-white/40 underline-offset-[6px] hover:decoration-white">Replay the Serbia investigation (recorded)</button>
+          <button onClick={onSerbia} disabled={busy || live === false} className="text-[17px] text-white underline decoration-white/40 underline-offset-[6px] hover:decoration-white disabled:opacity-50">{busy ? "Opening the case…" : "Open the Serbia investigation now"}</button>
         </div>
+        {live === false && <p role="alert" className="mt-4 text-[15px] text-[#ffb4a8]">The live court is offline: the server has no working model key or credit.</p>}
+        {error && <p role="alert" className="mt-4 text-[15px] text-[#ffb4a8]">{error}</p>}
       </motion.div>
     </motion.section>
   );

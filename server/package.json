@@ -7,8 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "prove": "tsx src/scripts/prove-concurrency.ts",
-    "record": "tsx src/scripts/prove-concurrency.ts \"International observers gave Serbia’s 25 October 2026 election a positive assessment, praising high voter turnout and vigorous competition.\" ../web/public/sample-case.json https://odihr.osce.org/node/666908",
+    "prove": "tsx src/scripts/prove-concurrency.ts \"International observers gave Serbia’s 25 October 2026 election a positive assessment, praising high voter turnout and vigorous competition.\" \"\" https://odihr.osce.org/node/666908",
     "check-evidence": "tsx src/scripts/check-evidence.ts"
   },
   "dependencies": {

@@ -226,3 +226,14 @@ Every shot used the recording or the empty room. **No API calls were made.**
 - **Verdict:** **Misleading (76%)**, "Observers praised turnout but assessment was deliberately mixed, not positive", from 9 verified exhibits
 - **Concurrency:** peak of 3 agent turns at once; 0 browser errors
 - **Frames:** `50-live-*`
+
+
+---
+
+# Revision 6: live only
+
+Recorded runs are removed from the product: the replay mode, `web/public/sample-case.json`, every "recorded" button and banner, and the replay-based tests. The cold open's second action now opens the Serbia case **live**, and old `?demo` links land in the live newsroom.
+
+**A live-only bug found:** the model sent the verdict's `uncertainties` as a string (`'["…"], ["…"]'`) instead of a list, which crashed the ruling sheet. This was fixed at both ends: the server normalises every list-valued tool argument, and the client tolerates either form. The recording had never exercised this path.
+
+**Validation (live, 1 Nov 2026), case `df29028d`:** cold open → "Open the Serbia investigation now" → all stages → decision 1 (L1 to the Investigator and L2 to the Prosecutor, concurrent) → decision 2 (send to the judge) → **Misleading (84%)**, 8 exhibits, 6 challenges (5 conceded, 1 rebutted), peak of 3 concurrent agent turns, ruling stamped, **0 browser errors**. Frames: `50-live-*`.

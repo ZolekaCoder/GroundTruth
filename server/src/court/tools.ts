@@ -23,6 +23,15 @@ const STANCE_ALIASES: Record<string, Stance> = {
   supported: "supported", true: "supported", contradicted: "contradicted", false: "contradicted",
   misleading: "misleading", "missing context": "misleading", insufficient: "insufficient", "insufficient evidence": "insufficient", unverifiable: "insufficient",
 };
+/** List-valued arguments sometimes arrive as strings ('["a"], ["b"]'); normalise to string[]. */
+function asList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.flat(3).map(String).map((x) => x.trim()).filter(Boolean);
+  if (typeof v !== "string" || !v.trim()) return [];
+  for (const attempt of [v, `[${v}]`]) {
+    try { const j = JSON.parse(attempt); if (Array.isArray(j)) return j.flat(3).map(String).map((x) => x.trim()).filter(Boolean); } catch { /* try the next form */ }
+  }
+  return v.split(/\n|;\s+|,\s*(?=E\d+)/).map((x) => x.replace(/^[\s\-•"[\]]+|[\s"[\]]+$/g, "")).filter(Boolean);
+}
 const asBearing = (v: unknown) => BEARING_ALIASES[String(v).toLowerCase().trim()];
 const asStance = (v: unknown) => STANCE_ALIASES[String(v).toLowerCase().trim()];
 
@@ -103,7 +112,7 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
       async ({ target, kind, point, evidence_ids }) => {
         const k = c();
         if (k.phase !== "cross_examination" && k.phase !== "objection") return "Challenges are only allowed during cross-examination.";
-        k.challenges.push({ id: `C${k.challenges.length + 1}`, round: k.round, from: role, to: target, kind: kind === "framing" ? "framing" : "factual", point, evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)), at: Date.now() });
+        k.challenges.push({ id: `C${k.challenges.length + 1}`, round: k.round, from: role, to: target, kind: kind === "framing" ? "framing" : "factual", point, evidenceIds: asList(evidence_ids).filter((id: string) => k.evidence.some((e) => e.id === id)), at: Date.now() });
         log(k, role, "said", `${kind === "framing" ? "Framing" : "Factual"} objection to the ${target}: ${point}`);
         return "Challenge recorded.";
       }),
@@ -124,7 +133,7 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
         const k = c();
         const lead = k.leads.find((l) => l.id === lead_id);
         if (!lead || lead.assignee !== role || lead.status !== "assigned") return "That lead is not assigned to you, or is already reported.";
-        Object.assign(lead, { status: "reported", finding, evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)), reportedAt: Date.now() });
+        Object.assign(lead, { status: "reported", finding, evidenceIds: asList(evidence_ids).filter((id: string) => k.evidence.some((e) => e.id === id)), reportedAt: Date.now() });
         log(k, role, "said", `Reported on ${lead.id}`);
         sendEvent(SemanticEvent.create(LEAD_EVENT, agentId(), { caseId, round: k.round, role, leadId: lead.id }), agentId());
         return "Lead reported. If you have no other assigned leads, reply with one short sentence and stop.";
@@ -159,7 +168,7 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
         const prev = [...k.filings].reverse().find((f) => f.role === role);
         const filing: Filing = {
           role, round: k.round, stance, confidence: Math.max(0, Math.min(100, confidence)), argument,
-          evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)),
+          evidenceIds: asList(evidence_ids).filter((id: string) => k.evidence.some((e) => e.id === id)),
           changed: !!prev && (prev.stance !== stance || Math.abs(prev.confidence - confidence) >= 15),
           whatChanged: what_changed || undefined, at: Date.now(),
         };
@@ -192,8 +201,8 @@ export function judgeTools(caseId: string, agentId: () => string): Tool[] {
         if (!verdict) return `Rejected: verdict must be one of ${STANCES.join(", ")}.`;
         const v: Verdict = {
           round: k.round, verdict, confidence: Math.max(0, Math.min(100, a.confidence)), headline: a.headline,
-          summary: a.summary, reasoning: a.reasoning, uncertainties: a.uncertainties, framingNotes: a.framing_notes ?? [], at: Date.now(),
-          keyEvidenceIds: a.key_evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)),
+          summary: a.summary, reasoning: a.reasoning, uncertainties: asList(a.uncertainties), framingNotes: asList(a.framing_notes), at: Date.now(),
+          keyEvidenceIds: asList(a.key_evidence_ids).filter((id: string) => k.evidence.some((e) => e.id === id)),
         };
         k.verdicts.push(v);
         log(k, "judge", "said", `Verdict: ${verdict.toUpperCase()}`);

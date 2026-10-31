@@ -29,7 +29,7 @@ The newsroom is a real-time 3D room built with **React Three Fiber, Drei and thr
 - **Light:** the sun comes through the steel-framed window wall and throws real window shadows across the floor and the evidence board.
 - **Camera:** it travels between the room, the election table, each workstation and the evidence wall, and stays inside the room. Drag to look around; `Esc` returns to the overview.
 - **Everything readable is drawn from case data onto textures:** monitor screens (live Mozaik activity, or the agent's position), clippings with each source's own photo (served through a guarded same-origin proxy, because WebGL needs CORS-clean pixels), handwritten lead cards, the ruling, the map and the newspaper. Strings run from each exhibit to the claim, coloured by bearing. Close reading happens in the document sheets, not in tiny 3D text.
-- **Opening:** a broadcast cold open. The camera starts inside the newsroom, tight on the live election board (the three elections and their countdowns), framed by a letterbox with a LIVE bug and the real time, and a lower third with the title and two actions. "Walk into the newsroom" (or Enter) retracts the frame while the camera dollies back into the room. The recorded Serbia investigation is at `?demo` (`&speed=1` plays it in real time).
+- **Opening:** a broadcast cold open. The camera starts inside the newsroom, tight on the live election board (the three elections and their countdowns), framed by a letterbox with a LIVE bug and the real time, and a lower third with the title and two actions. "Walk into the newsroom" (or Enter) retracts the frame while the camera dollies back into the room; "Open the Serbia investigation now" starts the flagship case live.
 - **Election desk identity:** a wall sign reading "The Ground Truth | ELECTION DESK"; a live election screen (the three elections, with countdowns, and what the desk is investigating now); a scrolling ticker of sourced dossier facts and live case events; a hanging sign over each desk showing its live status; and framed election posters.
 - **People:** a reporter at each agent desk (typing while that agent's loop runs, on the phone while chasing a lead, reading when filed), the editor-in-chief at the table who moves to the wall to rule, and a researcher at the shelves. They are sculptural, faceless figures in the style of architectural visualisation, used because no realistic, licensed character models were available without an account.
 - **Agents are present through their workstations:** each screen streams that agent's activity, its arm lamp lights while its loop runs, its chair swivels, its paper tray fills with every verified quote, speech bubbles show challenges, rebuttals and leads, and verified clippings fly from the desk to the wall. Large monitors make the three active desks the most prominent objects in the room.
@@ -68,7 +68,7 @@ Forms of Mozaik concurrency on show:
 - **Targeted reaction:** a rebuttal summons reaches only the challenged agents.
 - **Event-driven coordination:** the Clerk advances on filing, lead-report and rebuttal events, never on a timer or a script.
 
-The bundled recording (`web/public/sample-case.json`, a real run) goes through every stage: two leads ran concurrently on two desks, and four challenges were rebutted and conceded. The investigator changed position, and the ruling was *Contradicted (82%)*. A replay **stops at each editor's decision** and waits for you. In that recording the decisions were taken by the test autopilot, and the UI says so.
+Every investigation is a live run: real Mozaik agents making real model calls with your key. There are no recorded or replayed cases. In the final validation run (1 Nov 2026), all three reporters started within the same millisecond, two leads were researched concurrently on two desks, five challenges were conceded and one rebutted, and the ruling was *Misleading (84%)*.
 
 `Esc` or **Back to the room** always returns to the overview without losing the case. A **text view** of every case is one click away, for accessibility and as a non-spatial fallback. Narrow screens get a small station strip. Reduced-motion users get instant camera cuts and no parallax. Visual QA (screenshots, critique and scores) is in [`VISUAL_QA.md`](VISUAL_QA.md).
 
@@ -90,7 +90,7 @@ The Serbia dossier's test claim is **synthetic**: we wrote it to test the court,
 
 > "International observers gave Serbia’s 25 October 2026 election a positive assessment, praising high voter turnout and vigorous competition."
 
-It is built from real words in the OSCE/ODIHR summary but leaves out what follows them. In the recorded run (`web/public/sample-case.json`, a real unedited run), the court read the OSCE report, entered 9 verified exhibits, and ruled **Misleading (82%)**: *"Claim isolates praise, omits election observers' systemic concerns."* The Judge listed selective quotation and omitted context as **framing** problems, separately from the facts, and flagged an honest uncertainty about whether "the election" means election day or the whole campaign.
+It is built from real words in the OSCE/ODIHR summary but leaves out what follows them. Live runs consistently rule it **Misleading** (76–84% across the final runs), naming selective quotation as a framing problem rather than a factual error.
 
 The US and South Africa dossiers carry synthetic test claims of their own, about who certifies results and whether the Disinformation Code bans satire. They run live.
 
@@ -126,7 +126,7 @@ flowchart LR
 4. Phase changes are event-driven. Each `file_position` tool call publishes `court.filing`. The Clerk's handler advances the case to cross-examination, then to deliberation, once every advocate has filed. If an agent misses its deadline, that is recorded as **no filing**. A position is never invented for it.
 5. The UI's **Live investigation timeline** is drawn from real `inference.started` and `model.answer` loop events that Mozaik publishes, so overlapping bars mean overlapping wall-clock time. The "peak concurrent" figure is computed with a sweep-line over those intervals.
 
-`npm run record` runs a full case headlessly. It prints each agent turn's wall-clock window and the peak concurrency, then saves the run as the bundled recorded case.
+`npm run prove` runs a full live case headlessly (the clerk takes the editor's decisions) and prints each agent turn's wall-clock window and the peak concurrency.
 
 ### Evidence integrity
 
@@ -151,20 +151,17 @@ Open http://localhost:5173 and you're standing in the newsroom.
 **Visual QA and journey tests** (Playwright driving your installed Chrome; no browser download):
 
 ```bash
-node scripts/flows3d.mjs check            # the 3D room's journeys on the recorded case (software WebGL; slow)
-node scripts/flows.mjs 1440 900 check     # the 2D fallback's journeys on the recorded case → artifacts/visual-qa/
+node scripts/live-final.mjs               # a full LIVE case through the 3D room: cold open → decisions → stamped ruling
 node scripts/shoot.mjs name / 1440 900    # one screenshot + console errors
 node scripts/live-flow.mjs                # a real live case through the room (uses the model key)
 npm run check-evidence                    # quote verification against a real source, no model
 ```
 
-**Re-record the flagship Serbia case** (needs a funded key, about 1–2 minutes):
+**Prove concurrency headlessly** (live, needs a funded key, about 1–2 minutes):
 
 ```bash
-npm run record                # writes web/public/sample-case.json
+npm run prove
 ```
-
-The **Watch the recorded investigation** button replays that file at 4× speed using its own timestamps. The UI labels it as a recording, with the date it was recorded, and nothing in it is generated client-side.
 
 ### Chrome extension
 
@@ -186,10 +183,10 @@ docs/     submission text and demo script
 ## Status and limits
 
 - **Live:** Election Desk with globe and three source-quoted dossiers, concurrent investigation, verified evidence ledger, cross-examination with factual/framing challenges and revisions, judge verdict with framing notes and uncertainty, Objection! re-trial, evidence board, shareable summary, extension.
-- **Labelled:** dossier test claims are marked *Synthetic test claim* everywhere they appear, including inside the courtroom. The replay is marked *Recorded investigation*. The calibration docket uses non-political myths.
+- **Labelled:** dossier test claims are marked *Synthetic test claim* everywhere they appear, including inside the courtroom.
 - **Every dossier quote** was checked with the court's own verbatim verifier against the retrieved page. One summariser-supplied "quote" failed that check and was removed. `elections.org.za` redirected to a third-party domain when checked, so the dossier cites the government statement for IEC facts.
 - **Enum hardening:** tool-schema enums aren't enforced by every provider (the model once sent `"contradicts"`), so bearings, stances and verdicts are normalised or rejected server-side, and the room tolerates unknown values.
-- **Cases are in memory:** restarting the server clears live cases, while the bundled recording is unaffected.
+- **Cases are in memory:** restarting the server clears live cases.
 - **Reliability:** if a Mozaik loop dies silently (the model returns an empty reply and the loop throws `No transition rule found after "inference"`), the Clerk detects 20s of silence and re-summons that agent, at most twice. Orphaned turns are closed when the round is decided.
 - **Not built:** *Same Story, Different Spin*, the side-by-side article comparison. It was deprioritised in favour of the Investigation Room.
 - Search uses the Wikipedia API (reliable, keyless). Agents can read any article URL, but script-rendered or paywalled pages are reported as unreadable rather than guessed at.

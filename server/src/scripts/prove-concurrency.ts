@@ -1,5 +1,5 @@
 /**
- * Headless proof that the advocates run concurrently on Mozaik.
+ * Headless, live proof that the advocates run concurrently on Mozaik (real model calls).
  * Opens a real case, waits for the verdict, then prints each agent turn's wall-clock window
  * and the peak number of simultaneously open turns.
  */

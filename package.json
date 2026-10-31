@@ -12,7 +12,6 @@
     "build": "npm run build -w server && npm run build -w web",
     "start": "npm run start -w server",
     "prove": "npm run prove -w server",
-    "record": "npm run record -w server",
     "check-evidence": "npm run check-evidence -w server"
   },
   "devDependencies": {
