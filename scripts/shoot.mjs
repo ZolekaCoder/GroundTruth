@@ -2,7 +2,7 @@
 // usage: node scripts/shoot.mjs <name> <path> [width] [height] [waitMs] [clickSelectors...]
 import { chromium } from "playwright";
 const [name, path = "/", w = "1440", h = "900", wait = "2500", ...clicks] = process.argv.slice(2);
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const browser = await chromium.launch({ channel: "chrome", headless: true, args: ["--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: 1 });
 const errors = [];
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));

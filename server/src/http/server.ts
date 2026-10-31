@@ -26,6 +26,29 @@ export function createServer() {
     }
   });
 
+  // Source images for WebGL textures. Many publishers send no CORS headers, and WebGL refuses
+  // cross-origin images without them, so the 3D room loads them through here. Guarded: public
+  // http(s) hosts only, image content types only, size-capped.
+  app.get("/api/image", async (req, res) => {
+    const raw = String(req.query.url ?? "");
+    let u: URL;
+    try { u = new URL(raw); } catch { return res.status(400).end(); }
+    const host = u.hostname.toLowerCase();
+    const privateHost = host === "localhost" || host.endsWith(".local") || host.endsWith(".internal") || /^\[/.test(host) ||
+      /^(127|10|0)\./.test(host) || /^192\.168\./.test(host) || /^169\.254\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+    if (!/^https?:$/.test(u.protocol) || privateHost) return res.status(400).end();
+    try {
+      const r = await fetch(u, { headers: { "User-Agent": "TheGroundTruth/1.0 (image proxy)" }, signal: AbortSignal.timeout(10_000), redirect: "follow" });
+      const type = r.headers.get("content-type") ?? "";
+      if (!r.ok || !type.startsWith("image/")) return res.status(502).end();
+      const buf = Buffer.from(await r.arrayBuffer());
+      if (buf.length > 8_000_000) return res.status(413).end();
+      res.set({ "Content-Type": type, "Cache-Control": "public, max-age=86400" }).send(buf);
+    } catch {
+      res.status(502).end();
+    }
+  });
+
   app.get("/api/cases/:id", (req, res) => {
     const c = getCase(req.params.id);
     if (!c) return res.status(404).json({ error: "Case not found" });

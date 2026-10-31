@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, FileText, Radio, RotateCcw } from "lucide-react";
 import type { Advocate, Case } from "../lib/types";
@@ -10,9 +10,11 @@ import { decide, type EditorDecision } from "../lib/api";
 import { CaseFolder, DeskNote, ElectionMap, NightEdition } from "./TableProps";
 import { Workstation } from "./Workstation";
 import { EvidenceWall } from "./EvidenceWall";
+// The 3D room is code-split: the 2D room never downloads three.js.
+const Newsroom3D = lazy(() => import("../room3d/Newsroom3D"));
 import { AgentFile, CaseSheet, DossierFolder, EditorMemo, EvidenceSheet, SourceSheet, VerdictSheet } from "./Papers";
 
-type Focus = "overview" | "table" | "desk" | "wall" | Advocate;
+export type Focus = "overview" | "table" | "desk" | "wall" | Advocate;
 type Overlay = null | { kind: "editor" } | { kind: "dossier"; id: Dossier["id"] } | { kind: "case" } | { kind: "agent"; role: Advocate } | { kind: "evidence"; id: string } | { kind: "source"; id: string } | { kind: "verdict" };
 
 const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }> = {
@@ -27,7 +29,8 @@ const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }
 
 const reduceMotion = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, onDemo, onObjection, onRestartReplay, onTextView, replayT, replayPaused, onResume }: {
+export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, onOpenCase, onDemo, onObjection, onRestartReplay, onTextView, replayT, replayPaused, onResume }: {
+  mode?: "2d" | "3d";
   c: Case | null; live: boolean; recorded: boolean; busy: boolean; error: string | null; liveCourt: boolean | null;
   replayT?: number; replayPaused?: boolean; onResume?: () => void;
   onOpenCase: (input: { claim?: string; url?: string }) => Promise<boolean>; onDemo: () => void;
@@ -90,6 +93,19 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#e9e1d2]" onPointerMove={(e) => parallax && setPx({ x: (e.clientX / vp.w - 0.5) * 2, y: (e.clientY / vp.h - 0.5) * 2 })}>
+      {mode === "3d" ? (
+        <Suspense fallback={<div className="grid h-full place-items-center bg-[#e9e1d2]"><p className="hint text-[#3d2a1a]">Opening the newsroom…</p></div>}>
+          <Newsroom3D c={c} now={now} focus={focus} sheetOpen={!!overlay}
+            onFocus={(f) => go(f)}
+            onPin={(id) => go("table", { kind: "dossier", id })}
+            onCaseFolder={() => go("desk", { kind: "case" })}
+            onAgent={(r) => go(r, { kind: "agent", role: r })}
+            onEvidence={(id) => go("wall", { kind: "evidence", id })}
+            onVerdict={() => go("wall", { kind: "verdict" })}
+            onSource={(id) => go("wall", { kind: "source", id })} />
+        </Suspense>
+      ) : (
+      <>
       <div className="world absolute left-0 top-0" data-focus={focus} style={{ width: STAGE.w, height: STAGE.h, transform: `translate(${tx}px, ${ty}px) scale(${s})` }}>
         {/* background */}
         <div className="absolute inset-0" style={layer(-5)}>
@@ -147,6 +163,8 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
       {/* lens: vignette and warm grade, in screen space */}
       <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(130% 100% at 55% 45%, transparent 62%, rgba(60,40,22,.28) 100%)" }} />
 
+      </>
+      )}
       {/* HUD: small, at the edges */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 sm:p-5">
         <div className="pointer-events-auto">
@@ -176,6 +194,7 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
             <div className="hint rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper/80">{liveCourt === false ? "Court offline · recordings only" : "Court in session"}</div>
           )}
           {synthetic && <div className="hint bg-[#1b1611]/85 px-3 py-1 text-[#e6c48f]">Synthetic test claim<span className="hidden sm:inline"> ({synthetic.country} dossier), not attributed to anyone</span></div>}
+          <a href={(() => { const p = new URLSearchParams(location.search); if (mode === "3d") p.set("view", "2d"); else p.delete("view"); const q = p.toString().replace("demo=", "demo"); return q ? `?${q}` : "/"; })()} className="hint hidden text-paper/80 underline-offset-2 hover:underline sm:inline">{mode === "3d" ? "2D view" : "3D view"}</a>
           {c && onTextView && <button onClick={onTextView} className="hint hidden sm:inline-flex items-center gap-1.5 text-paper/70 underline-offset-2 hover:text-paper hover:underline"><FileText size={13} /> Text view of this case</button>}
         </div>
       </header>
@@ -198,11 +217,17 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
       )}
 
       {/* narrow screens can't show the whole room, so the stations get a small strip */}
-      {vp.w < 700 && !overlay && (
-        <nav aria-label="Stations" className="absolute inset-x-2 bottom-10 flex justify-between gap-1 rounded-sm bg-[#1b1611]/90 p-1">
-          {([["table", "Table"], ["wall", "Wall"], ["investigator", "Invest."], ["prosecutor", "Prosec."], ["defender", "Defence"]] as [Focus, string][]).map(([f, l]) => (
-            <button key={f} onClick={() => go(f, f === "table" || f === "wall" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-1 py-1.5 text-[11.5px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper/80"}`}>{l}</button>
+      {(vp.w < 700 || mode === "3d") && !overlay && (
+        <nav aria-label="Stations" className={`absolute flex justify-between gap-1 rounded-sm bg-[#1b1611]/90 p-1 ${vp.w < 700 ? "inset-x-2 bottom-10" : "bottom-14 left-4"}`}>
+          {([["overview", "Room"], ["table", "Table"], ["wall", "Wall"], ["investigator", "Invest."], ["prosecutor", "Prosec."], ["defender", "Defence"]] as [Focus, string][]).filter(([f]) => f !== "overview" || mode === "3d").map(([f, l]) => (
+            <button key={f} onClick={() => go(f, f === "table" || f === "wall" || f === "overview" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-1 py-1.5 text-[11.5px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper/80"}`}>{l}</button>
           ))}
+        </nav>
+      )}
+      {mode === "3d" && focus === "wall" && !overlay && c && (c.evidence.length > 0 || c.verdicts.length > 0) && (
+        <nav aria-label="Exhibits on the wall" className="absolute bottom-24 left-1/2 flex max-w-[92vw] -translate-x-1/2 flex-wrap justify-center gap-1 rounded-sm bg-[#1b1611]/85 p-1">
+          {c.evidence.map((e) => <button key={e.id} onClick={() => setOverlay({ kind: "evidence", id: e.id })} aria-label={`Exhibit ${e.id}: ${e.quote}`} className="typed rounded-sm px-2 py-1 text-[12px] text-paper hover:bg-paper hover:text-[#2b241c]">{e.id}</button>)}
+          {c.verdicts.length > 0 && <button onClick={() => setOverlay({ kind: "verdict" })} aria-label="RULING OF THE COURT" className="typed rounded-sm bg-[#a3302a] px-2 py-1 text-[12px] text-white">Ruling</button>}
         </nav>
       )}
       {/* documents */}

@@ -10,6 +10,10 @@ import { health, objection, openCase } from "./lib/api";
 
 type View = { caseId: string | null; demo: boolean; text: boolean };
 
+/** The 3D room needs WebGL; without it (or with ?view=2d) the illustrated 2D room is used. */
+const webgl = (() => { try { const cv = document.createElement("canvas"); return !!(cv.getContext("webgl2") || cv.getContext("webgl")); } catch { return false; } })();
+const roomMode = (): "2d" | "3d" => (new URLSearchParams(location.search).get("view") === "2d" || !webgl ? "2d" : "3d");
+
 function readView(): View {
   const p = new URLSearchParams(location.search);
   return { caseId: p.get("case"), demo: p.has("demo"), text: p.get("view") === "text" };
@@ -28,6 +32,7 @@ export default function App() {
     if (v.caseId) p.set("case", v.caseId);
     if (v.demo) p.set("demo", "");
     if (v.text) p.set("view", "text");
+    else if (roomMode() === "2d" && webgl) p.set("view", "2d");
     history.pushState(null, "", p.toString() ? `?${p.toString().replace("demo=", "demo")}` : "/");
     setView(v);
   };
@@ -80,7 +85,7 @@ export default function App() {
   return (
     <>
       <ErrorBoundary key={view.caseId ?? (view.demo ? "demo" : "room")} onTextView={c ? () => { location.assign(`${location.search}${location.search ? "&" : "?"}view=text`); } : undefined}>
-      <Scene c={c} live={!!view.caseId} recorded={view.demo} busy={busy} error={error ?? (view.demo ? replay.error : null)} liveCourt={liveCourt}
+      <Scene mode={roomMode()} c={c} live={!!view.caseId} recorded={view.demo} busy={busy} error={error ?? (view.demo ? replay.error : null)} liveCourt={liveCourt}
         onOpenCase={open} onDemo={demo} onObjection={raise}
         onRestartReplay={view.demo ? replay.restart : undefined}
         replayT={replay.t} replayPaused={replay.paused} onResume={replay.resume}

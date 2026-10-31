@@ -9,7 +9,7 @@ page.on("pageerror", (e) => errors.push(String(e)));
 const shot = async (n) => { await page.screenshot({ path: `artifacts/visual-qa/${tag}-${n}.png` }); console.log("shot", n); };
 const step = async (name, fn) => { try { await fn(); console.log("PASS", name); } catch (e) { console.log("FAIL", name, String(e).split("\n")[0]); } };
 
-await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
+await page.goto("http://localhost:5173/?view=2d", { waitUntil: "networkidle" });
 await page.waitForTimeout(1500);
 await step("1 enter the newsroom", async () => { await page.getByText("The election table · pick a country").waitFor(); });
 await step("2 open a country dossier", async () => {

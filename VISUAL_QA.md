@@ -132,3 +132,42 @@ All design iteration in this revision used the **recorded** investigation. The A
 - **People are simple vector figures** with a handful of poses, not animated characters.
 - **Comparing two outlets side by side** isn't built. Readers compare reporting by objecting with a second source.
 - **The live memo's buttons haven't been clicked against a live case in the UI.** The decision logic itself (`decide()`) ran live via autopilot, and the HTTP endpoint is a thin wrapper, checked for input validation.
+
+
+---
+
+# Revision 3: the 3D newsroom
+
+All iteration used the recording or the empty room. **No API calls were made.** The screenshots come from headless Chrome rendering WebGL in software (SwiftShader), so they show exactly what the code draws, but slowly.
+
+| Shot | What it showed | What changed next |
+|---|---|---|
+| `20-3d-A-overview` | WebGL works: Poly Haven furniture, PBR floor and walls, shadows. **Problems:** the "table" model was a round stool and, scaled to 2.5 m, became a giant; chairs faced away from their desks; the window wall was out of shot. | A custom oak-veneer table on steel legs; chair orientation fixed; a diagonal overview |
+| `21-3d-B-overview` | The room reads properly: table, lamps, a city through steel windows. **Problems:** the agent desks weren't in the overview; muddy beige walls; flat light; cartoonish rug bands. | Desks re-planned to face the room, with camera shots derived from each desk; light plaster; stronger sun; a finer rug |
+| `22-3d-C-overview` | Sun and mullion shadows across the floor and board; all three desks visible. **Problems:** grey wall albedo; front desks cropped; a dark tower outside. | Normal-map-only plaster in warm white; desks moved in; four HDRI rotations compared (`23-hdri-*`) and the brightest chosen |
+| `24-3d-*` journeys | **Two real bugs found:** clicking a map-pin label also triggered a 3D raycast (it opened the Investigator's desk instead of the dossier); and 3D speech bubbles could stack over the dock. **One test-ordering issue:** the replay reached decision 2 before the desk step. | Pointer events stopped on labels; the 3D container isolates its stacking context; steps reordered. **All 10 steps pass, 0 console errors** |
+| `24-3d-07`, `25-3d-E` | Desk close-up: the camera sat low behind the chair, the arm lamp floated off the desk, and the strings were hard V-shapes. | Higher desk shot; lamp seated on the desk; strings sag along a curve |
+| `25` (console) | A React warning: images loaded during render. | Image loading moved into effects, with a listener per image |
+| `27-3d-G-overview` | An empty board looked bare. | Three sourced desk-research quotes pinned; election posters (atlas outline, election, date) on the side wall |
+| `28-2d-fallback-*` | The 2D fallback: **all 11 steps pass** on `?view=2d`. | — |
+| `29-3d-mobile-390` | Narrow screens: the 3D room and the station strip, no overflow. | — |
+
+## Scores, revision 3
+
+| Criterion | Score | Why |
+|---|---|---|
+| Environmental immersion | **4/5** | A real 3D room you can look around in, with sunlight, shadows and a city outside. |
+| Architectural depth | **4.5/5** | True perspective and occlusion. Camera moves between stations reveal the space. |
+| Material realism | **4/5** | PBR parquet, plaster and oak, scanned furniture and plants, HDRI reflections. The rug and posters are canvas-drawn. |
+| Visual originality | **3.5/5** | Believable and bright, but closer to a clean architectural visualisation than a distinctive art direction. |
+| Interaction clarity | **4/5** | Clickable pins, monitors and documents, plus a station dock and exhibit chips. |
+| Product relevance | **4.5/5** | Election map, posters and desk research for all three countries, and the flagship Serbia case on the wall. |
+| Functional integrity | **5/5** | Every journey passes in 3D and in the 2D fallback. The backend and extension are untouched. |
+| Overall polish | **3.5/5** | Coherent and working. Software-rendered screenshots understate it, and there are no people and no post-processing. |
+
+## Not done
+
+- **No 3D journalists.** No suitable licensed realistic character assets were available without an account. Agents are present through their desks.
+- **No post-processing** (ambient occlusion, bloom). This was left out to keep it reliable on modest GPUs and in software rendering.
+- **The room is sparse in places**, with large wall areas left empty.
+- **The 3D bundle is about 290 KB gzipped**, lazy-loaded, plus about 44 MB of assets fetched on demand.

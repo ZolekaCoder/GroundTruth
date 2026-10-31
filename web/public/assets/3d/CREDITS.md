@@ -1,0 +1,26 @@
+# 3D assets
+
+All assets from [Poly Haven](https://polyhaven.com), licensed **CC0** (public domain).
+
+- [modern_arm_chair_01](https://polyhaven.com/a/modern_arm_chair_01)
+- [metal_office_desk](https://polyhaven.com/a/metal_office_desk)
+- [WoodenTable_02](https://polyhaven.com/a/WoodenTable_02)
+- [potted_plant_01](https://polyhaven.com/a/potted_plant_01)
+- [potted_plant_02](https://polyhaven.com/a/potted_plant_02)
+- [pachira_aquatica_01](https://polyhaven.com/a/pachira_aquatica_01)
+- [wooden_display_shelves_01](https://polyhaven.com/a/wooden_display_shelves_01)
+- [book_encyclopedia_set_01](https://polyhaven.com/a/book_encyclopedia_set_01)
+- [binder_notebook](https://polyhaven.com/a/binder_notebook)
+- [modern_ceiling_lamp_01](https://polyhaven.com/a/modern_ceiling_lamp_01)
+- [desk_lamp_arm_01](https://polyhaven.com/a/desk_lamp_arm_01)
+- [hanging_picture_frame_02](https://polyhaven.com/a/hanging_picture_frame_02)
+- [wall_clock](https://polyhaven.com/a/wall_clock)
+- [office_notepads](https://polyhaven.com/a/office_notepads)
+- [sofa_02](https://polyhaven.com/a/sofa_02)
+- [coffee_table_round_01](https://polyhaven.com/a/coffee_table_round_01)
+- [mid_century_lounge_chair](https://polyhaven.com/a/mid_century_lounge_chair)
+- [herringbone_parquet](https://polyhaven.com/a/herringbone_parquet)
+- [painted_plaster_wall](https://polyhaven.com/a/painted_plaster_wall)
+- [beige_wall_001](https://polyhaven.com/a/beige_wall_001)
+- [canary_wharf](https://polyhaven.com/a/canary_wharf)
+- [oak_veneer_01](https://polyhaven.com/a/oak_veneer_01)

@@ -21,7 +21,20 @@ Most election misinformation is not invented from nothing. It is a real sentence
 - **Fact vs framing:** challenges are tagged as *factual* (is it true?) or *framing* (what was selected, emphasised or left out). The Judge lists framing problems separately from factual findings.
 - **No consensus-as-proof:** agreement between agents never counts as evidence.
 
-## The experience: the newsroom
+## The 3D newsroom (default)
+
+The newsroom is a real-time 3D room built with **React Three Fiber, Drei and three.js** (`web/src/room3d/`):
+
+- **Assets:** CC0 furniture models, PBR textures (herringbone parquet, plaster, oak veneer) and a daylight city HDRI from [Poly Haven](https://polyhaven.com). They are listed in `web/public/assets/3d/CREDITS.md`, and `python3 scripts/fetch-assets.py` downloads them again if needed.
+- **Light:** the sun comes through the steel-framed window wall and throws real window shadows across the floor and the evidence board.
+- **Camera:** it travels between the room, the election table, each workstation and the evidence wall, and stays inside the room. Drag to look around; `Esc` returns to the overview.
+- **Everything readable is drawn from case data onto textures:** monitor screens (live Mozaik activity, or the agent's position), clippings with each source's own photo (served through a guarded same-origin proxy, because WebGL needs CORS-clean pixels), handwritten lead cards, the ruling, the map and the newspaper. Strings run from each exhibit to the claim, coloured by bearing. Close reading happens in the document sheets, not in tiny 3D text.
+- **Agents are present through their workstations:** each screen streams that agent's activity, its arm lamp lights while its loop runs, its chair swivels, its paper tray fills with every verified quote, speech bubbles show challenges, rebuttals and leads, and verified clippings fly from the desk to the wall. **There are no 3D human characters.** No realistic, properly licensed character assets were available without an account, and you ruled out placeholder people.
+- **Accessibility and tests:** a station dock and a row of exhibit chips give keyboard and screen-reader access to what is otherwise canvas-only.
+
+**Fallbacks:** `?view=2d` (or a link in the HUD) opens the illustrated 2D room, which is also used automatically when WebGL is unavailable. `?view=text` opens a plain text view of any case. The backend, the API and the Chrome extension are unchanged.
+
+## The illustrated 2D newsroom (fallback)
 
 You are the editor of a sunlit election newsroom. Each Mozaik agent is an illustrated reporter, labelled as an AI agent. You watch them work, and you make the calls that steer the investigation. There are no pages. The camera moves between stations in one room (see [`DESIGN.md`](DESIGN.md)):
 
@@ -135,7 +148,8 @@ Open http://localhost:5173 and you're standing in the newsroom.
 **Visual QA and journey tests** (Playwright driving your installed Chrome; no browser download):
 
 ```bash
-node scripts/flows.mjs 1440 900 check     # the seven journeys on the recorded case → artifacts/visual-qa/
+node scripts/flows3d.mjs check            # the 3D room's journeys on the recorded case (software WebGL; slow)
+node scripts/flows.mjs 1440 900 check     # the 2D fallback's journeys on the recorded case → artifacts/visual-qa/
 node scripts/shoot.mjs name / 1440 900    # one screenshot + console errors
 node scripts/live-flow.mjs                # a real live case through the room (uses the model key)
 npm run check-evidence                    # quote verification against a real source, no model
