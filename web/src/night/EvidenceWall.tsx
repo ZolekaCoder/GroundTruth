@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { stanceMeta, type Advocate, type Case, type Evidence } from "../lib/types";
+import { stanceMeta, type Advocate, type Case, type Evidence, type Lead, type Source } from "../lib/types";
 import { DOSSIERS } from "../lib/elections";
 import { AGENT_LOOK } from "./Workstation";
 
@@ -9,8 +9,8 @@ const CLIP = { w: 88, h: 80 };
 const SLOTS: [number, number][] = [
   [12, 12], [104, 18], [396, 18], [488, 12],
   ...Array.from({ length: 6 }, (_, i) => [12 + i * 94, 116] as [number, number]),
-  ...Array.from({ length: 4 }, (_, i) => [12 + i * 94, 214] as [number, number]),
 ];
+const LEAD_SLOTS: [number, number][] = [[14, 214], [112, 220], [210, 212], [308, 218]];
 const TAGS: Record<Advocate, number> = { prosecutor: 70, investigator: 245, defender: 420 };
 const BEARING = {
   supports: { color: "#6d7046", label: "Supports" },
@@ -28,30 +28,33 @@ export function EvidenceWall({ c, focused, onFocus, onEvidence, onVerdict, onAge
   onEvidence: (id: string) => void; onVerdict: () => void; onAgent: (r: Advocate) => void; onSource: (id: string) => void;
 }) {
   const evidence = (c?.evidence ?? []).slice(0, SLOTS.length);
+  const overflow = (c?.evidence.length ?? 0) - evidence.length;
+  const leads = (c?.leads ?? []).slice(-LEAD_SLOTS.length);
   const verdict = c?.verdicts.at(-1);
   const research = !c ? DOSSIERS.flatMap((d) => d.context.slice(-1).map((x) => ({ ...x, country: d.country }))) : [];
 
   return (
     <div className="station absolute inset-0" data-active={focused || undefined} style={{ pointerEvents: "none" }}>
       {/* frame shadow on the wall */}
-      <div className="absolute" style={{ left: 230, top: 40, width: 840, height: 400, boxShadow: "0 30px 50px rgba(0,0,0,.55)", borderRadius: 4 }} aria-hidden />
+      <div className="absolute" style={{ left: 230, top: 40, width: 840, height: 400, boxShadow: "0 18px 36px rgba(60,40,20,.25)", borderRadius: 4 }} aria-hidden />
 
       {/* left wing: sources */}
       <Wing side="left">
-        <p className="typed text-[7px] tracking-[.12em] text-paper/80">SOURCES</p>
+        <p className="hand text-[13px] leading-none text-[#3d2a1a]">Sources</p>
         {(c?.sources ?? []).slice(0, 4).map((s) => (
           <button key={s.id} onClick={() => onSource(s.id)} disabled={!focused} className="mat-paper mt-2 block w-full p-1.5 text-left" style={{ transform: `rotate(${rot(s.id)}deg)`, pointerEvents: focused ? "auto" : "none" }}>
+            {s.image && <img src={s.image.url} alt="" className="mb-1 h-[34px] w-full object-cover" style={{ filter: "saturate(.9)" }} referrerPolicy="no-referrer" />}
             <span className="typed block text-[5.5px] text-[#6b5a3c]">{s.id} · {s.publisher}</span>
             <span className="mt-0.5 font-serif text-[7px] font-semibold leading-tight line-clamp-3">{s.title}</span>
             <span className="typed mt-0.5 block text-[5px] text-[#6b5a3c]">{s.published ? `updated ${s.published.slice(0, 10)}` : "undated"}</span>
           </button>
         ))}
-        {!c && <p className="mt-2 text-[7px] leading-snug text-paper/60">Sources appear as the agents open them.</p>}
+        {!c && <p className="hand mt-2 text-[11px] leading-tight text-[#3d2a1a]/70">Sources go here as the desks open them.</p>}
       </Wing>
 
       {/* right wing: positions on file */}
       <Wing side="right">
-        <p className="typed text-[7px] tracking-[.12em] text-paper/80">POSITIONS</p>
+        <p className="hand text-[13px] leading-none text-[#3d2a1a]">Where we stand</p>
         {(["prosecutor", "defender", "investigator"] as Advocate[]).map((r) => {
           const f = c?.filings.filter((x) => x.role === r).at(-1);
           return (
@@ -65,9 +68,9 @@ export function EvidenceWall({ c, focused, onFocus, onEvidence, onVerdict, onAge
       </Wing>
 
       {/* the board */}
-      <div className="absolute mat-cork" onClick={!focused ? onFocus : undefined}
-        style={{ left: PANEL.x, top: PANEL.y, width: PANEL.w, height: PANEL.h, pointerEvents: "auto", cursor: focused ? "default" : "zoom-in", border: "10px solid #2e1e13", boxShadow: "inset 0 0 50px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,220,170,.08)" }}>
-        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(60% 70% at 50% 35%, rgba(255,214,150,.18), transparent 70%)" }} />
+      <div className="absolute mat-cork-day" onClick={!focused ? onFocus : undefined}
+        style={{ left: PANEL.x, top: PANEL.y, width: PANEL.w, height: PANEL.h, pointerEvents: "auto", cursor: focused ? "default" : "zoom-in", border: "10px solid #8a6340", boxShadow: "inset 0 0 30px rgba(80,50,20,.35), 0 10px 24px rgba(60,40,20,.3)" }}>
+        <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(200deg, rgba(255,250,230,.25), transparent 60%)" }} />
 
         {/* strings: drawn under the paper, from each pin to the claim */}
         <svg className="pointer-events-none absolute inset-0 overflow-visible" width={PANEL.w - 20} height={PANEL.h - 20} aria-hidden>
@@ -99,12 +102,19 @@ export function EvidenceWall({ c, focused, onFocus, onEvidence, onVerdict, onAge
 
         {/* exhibits */}
         <AnimatePresence>
-          {evidence.map((e, i) => <Clipping key={e.id} e={e} at={SLOTS[i]} focused={focused} onOpen={() => onEvidence(e.id)} />)}
+          {evidence.map((e, i) => <Clipping key={e.id} e={e} src={c?.sources.find((x) => x.id === e.sourceId)} at={SLOTS[i]} focused={focused} onOpen={() => onEvidence(e.id)} />)}
+        </AnimatePresence>
+
+        {overflow > 0 && <p className="hand absolute text-[12px] text-[#3d2a1a]" style={{ left: 500, top: 200 }}>+{overflow} more in the case file</p>}
+
+        {/* leads: index cards, stamped with what happened to them */}
+        <AnimatePresence>
+          {leads.map((l, i) => <LeadCard key={l.id} l={l} at={LEAD_SLOTS[i]} />)}
         </AnimatePresence>
 
         {/* before any case: real, sourced desk research from the dossiers */}
         {research.map((r, i) => (
-          <div key={r.quote} className="mat-paper absolute p-1.5" style={{ left: SLOTS[[4, 6, 9][i]][0], top: SLOTS[[4, 6, 9][i]][1], width: CLIP.w + 20, transform: `rotate(${[-2, 1.5, -1][i]}deg)` }}>
+          <div key={r.quote} className="mat-paper absolute p-1.5" style={{ left: SLOTS[[4, 6, 8][i]][0], top: SLOTS[[4, 6, 8][i]][1], width: CLIP.w + 20, transform: `rotate(${[-2, 1.5, -1][i]}deg)` }}>
             <Pin color="#8c6b43" />
             <p className="typed text-[5px] text-[#6b5a3c]">DESK RESEARCH · {r.country.toUpperCase()}</p>
             <p className="mt-0.5 font-serif text-[6.5px] leading-[1.2] line-clamp-5">“{r.quote}”</p>
@@ -138,18 +148,66 @@ export function EvidenceWall({ c, focused, onFocus, onEvidence, onVerdict, onAge
   );
 }
 
-function Clipping({ e, at, focused, onOpen }: { e: Evidence; at: [number, number]; focused: boolean; onOpen: () => void }) {
+const short = (q: string, words = 16) => { const w = q.split(/\s+/); return w.length > words ? `${w.slice(0, words).join(" ")}…` : q; };
+const isReport = (src?: Source) => !!src && /\.(org|gov|int)(\.|$)|gov\.|europa\.eu/.test(src.publisher) && !/wikipedia/.test(src.publisher);
+
+/** A pinned exhibit. Its form follows its source: a press clipping, a report page, or a web printout. */
+function Clipping({ e, src, at, focused, onOpen }: { e: Evidence; src?: Source; at: [number, number]; focused: boolean; onOpen: () => void }) {
   const from = FROM[e.citedBy];
+  const b = bearingOf(e.bearing);
+  const kind = src?.image && !isReport(src) ? "press" : isReport(src) ? "report" : "web";
   return (
-    <motion.button onClick={onOpen} disabled={!focused} aria-label={`Exhibit ${e.id}: ${bearingOf(e.bearing).label}. ${e.quote}`}
+    <motion.button onClick={onOpen} disabled={!focused} aria-label={`Exhibit ${e.id}: ${b.label}. ${e.quote}`}
       initial={{ x: from.x, y: from.y, rotate: 25, scale: 1.8, opacity: 0 }} animate={{ x: 0, y: 0, rotate: rot(e.id), scale: 1, opacity: 1 }}
       transition={{ duration: 1.1, ease: [0.3, 0.7, 0.2, 1] }}
-      className="mat-paper absolute p-1.5 text-left transition-[filter] hover:brightness-110" style={{ left: at[0], top: at[1], width: CLIP.w, height: CLIP.h, pointerEvents: focused ? "auto" : "none" }}>
-      <Pin color={bearingOf(e.bearing).color} />
-      <span className="typed flex justify-between text-[5.5px]"><span>{e.id}</span><span style={{ color: bearingOf(e.bearing).color }}>{bearingOf(e.bearing).label.toUpperCase()}</span></span>
-      <span className="mt-0.5 font-serif text-[6.6px] leading-[1.18] line-clamp-6">“{e.quote}”</span>
-      <span className="typed absolute bottom-1 left-1.5 right-1.5 truncate text-[5px] text-[#6b5a3c]">{e.publisher}</span>
+      className="mat-paper absolute overflow-hidden text-left transition-[filter] hover:brightness-105" style={{ left: at[0], top: at[1], width: CLIP.w, height: CLIP.h, pointerEvents: focused ? "auto" : "none" }}>
+      <Pin color={b.color} />
+      {kind === "report" && (
+        <>
+          <div className="flex items-center justify-between px-1.5 py-[3px] text-[#f4ecd8]" style={{ background: "#2c3e5c" }}>
+            <span className="typed text-[4.6px] tracking-[.08em]">{(src?.publisher ?? "").replace(/^www\./, "").toUpperCase()}</span>
+            <span className="typed text-[4.6px]">{e.id}</span>
+          </div>
+          {src?.image && <img src={src.image.url} alt="" className="h-[22px] w-full object-cover" referrerPolicy="no-referrer" />}
+          <p className="px-1.5 pt-1 font-serif text-[6.4px] leading-[1.25]"><span className="highlighter">{short(e.quote, src?.image ? 12 : 18)}</span></p>
+        </>
+      )}
+      {kind === "press" && (
+        <>
+          <div className="relative h-[30px] w-full overflow-hidden bg-[#ddd]">
+            <img src={src!.image!.url} alt="" className="halftone h-full w-full object-cover" referrerPolicy="no-referrer" />
+            <div className="halftone-dots absolute inset-0" />
+          </div>
+          <p className="px-1.5 pt-0.5 font-serif text-[7px] font-bold leading-[1.05] line-clamp-2">{src!.title}</p>
+          <p className="px-1.5 font-serif text-[5.6px] leading-[1.2] line-clamp-2">“{short(e.quote, 12)}”</p>
+        </>
+      )}
+      {kind === "web" && (
+        <>
+          <div className="flex items-center gap-1 border-b border-[#c9bd9f] bg-[#e6e1d6] px-1 py-[2px]">
+            <span className="size-[3px] rounded-full bg-[#c4683f]" /><span className="size-[3px] rounded-full bg-[#d9a441]" />
+            <span className="typed truncate text-[4.2px] text-[#5a4a32]">{e.url.replace(/^https?:\/\//, "")}</span>
+          </div>
+          <p className="px-1.5 pt-1 font-serif text-[6.6px] leading-[1.22]">“{short(e.quote, 16)}”</p>
+        </>
+      )}
+      <span className="absolute bottom-0.5 left-1.5 right-1.5 flex justify-between typed text-[4.6px]"><span className="text-[#6b5a3c]">{e.id}</span><span style={{ color: b.color }}>{b.label.toUpperCase()}</span></span>
     </motion.button>
+  );
+}
+
+/** A lead on an index card, handwritten by whoever raised it, stamped with its fate. */
+function LeadCard({ l, at }: { l: Lead; at: [number, number] }) {
+  const stamp = l.status === "assigned" ? `ON IT · ${(l.assignee ?? "").toUpperCase()}` : l.status === "reported" ? "FOLLOWED UP" : l.status === "dropped" ? "DEAD END" : "OPEN LEAD";
+  const tone = l.status === "reported" ? "#4f7d4a" : l.status === "assigned" ? "#2f5f63" : l.status === "dropped" ? "#7a6a58" : "#a3302a";
+  return (
+    <motion.div initial={{ y: -30, opacity: 0, rotate: -8 }} animate={{ y: 0, opacity: 1, rotate: ((l.id.charCodeAt(1) * 13) % 7) - 3 }} exit={{ opacity: 0 }}
+      className="absolute p-1.5" style={{ left: at[0], top: at[1], width: 90, height: 78, background: "linear-gradient(#f6e7a6, #f1dd8c)", boxShadow: "0 4px 8px rgba(60,40,20,.3)", backgroundImage: "linear-gradient(#f6e7a6,#f1dd8c), repeating-linear-gradient(transparent 0 11px, rgba(80,110,160,.25) 11px 12px)" }}>
+      <Pin color={tone} />
+      <p className="typed text-[4.8px] text-[#6b5a3c]">{l.id} · {l.by === "editor" ? "EDITOR" : l.by.toUpperCase()}</p>
+      <p className="hand mt-0.5 text-[9.5px] leading-[1] text-[#2b241c] line-clamp-4">{l.question}</p>
+      <span className="typed absolute bottom-1 left-1.5 border px-0.5 text-[4.6px]" style={{ color: tone, borderColor: tone, transform: "rotate(-3deg)" }}>{stamp}</span>
+    </motion.div>
   );
 }
 
@@ -160,7 +218,7 @@ function Pin({ color }: { color: string }) {
 function Wing({ side, children }: { side: "left" | "right"; children: React.ReactNode }) {
   return (
     <div className="absolute" style={{ left: side === "left" ? 236 : 940, top: 46, width: 124, height: 382, perspective: 900, pointerEvents: "auto" }}>
-      <div className="mat-cork h-full w-full p-2.5" style={{ transform: `rotateY(${side === "left" ? 34 : -34}deg)`, transformOrigin: side === "left" ? "100% 50%" : "0 50%", border: "8px solid #2e1e13", boxShadow: "inset 0 0 40px rgba(0,0,0,.65)", filter: "brightness(.82)" }}>
+      <div className="mat-cork-day h-full w-full p-2.5" style={{ transform: `rotateY(${side === "left" ? 34 : -34}deg)`, transformOrigin: side === "left" ? "100% 50%" : "0 50%", border: "8px solid #8a6340", boxShadow: "inset 0 0 26px rgba(80,50,20,.4)", filter: "brightness(.9)" }}>
         {children}
       </div>
     </div>

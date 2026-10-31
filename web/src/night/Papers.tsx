@@ -128,6 +128,7 @@ export function AgentFile({ role, c, onEvidence, onClose }: { role: Advocate; c:
       <div className="border-t-[6px] p-7" style={{ borderColor: look.phosphor }}>
         <Label>{look.plate} · {c?.busy[role] ? "WORKING NOW" : filings.length ? "POSITION ON FILE" : "NO FILING YET"}</Label>
         <h2 className="mt-1 font-serif text-[30px] font-semibold">{look.name}</h2>
+        <p className="typed text-[11px] text-[#6b5a3c]">AI agent (Mozaik) · illustrated as a reporter</p>
         <p className="text-[13.5px] text-[#5a4a32]">{look.purpose}</p>
         {!c && <p className="mt-6 text-[14px]">No case is open. Open one at the table and this desk will start working.</p>}
         {filings.map((f, i) => (
@@ -153,6 +154,18 @@ export function AgentFile({ role, c, onEvidence, onClose }: { role: Advocate; c:
           <div className="mt-6 border-t border-[#8a7a5c]/40 pt-4">
             <Label>CHALLENGED BY</Label>
             <ul className="mt-2 space-y-2 text-[13.5px]">{against.map((x) => <li key={x.id}><span className="typed text-[11px]" style={{ color: x.kind === "framing" ? "#8a5a1e" : "#a3302a" }}>{x.kind === "framing" ? "FRAMING" : "FACTUAL"} · {AGENT_LOOK[x.from].plate}</span><br />{x.point}</li>)}</ul>
+          </div>
+        )}
+        {(c?.leads ?? []).filter((l) => l.assignee === role || l.by === role).length > 0 && (
+          <div className="mt-6 border-t border-[#8a7a5c]/40 pt-4">
+            <Label>LEADS</Label>
+            <ul className="mt-2 space-y-2">{c!.leads.filter((l) => l.assignee === role || l.by === role).map((l) => (
+              <li key={l.id} className="p-2" style={{ background: "#f6e7a6" }}>
+                <p className="typed text-[10.5px] text-[#6b5a3c]">{l.id} · {l.by === role ? "raised" : "assigned"} · {l.status}</p>
+                <p className="hand text-[19px] leading-[1.05]">{l.question}</p>
+                {l.finding && <p className="typed mt-1 text-[12px]"><span className="text-[#8a5a1e]">FINDING (AGENT REASONING): </span>{l.finding}</p>}
+              </li>))}
+            </ul>
           </div>
         )}
         {mine.length > 0 && (
@@ -183,6 +196,12 @@ export function EvidenceSheet({ id, c, onClose }: { id: string; c: Case; onClose
     <Sheet onClose={onClose} label={`Exhibit ${e.id}`} width={600} tilt={0.9}>
       <div className="p-8">
         <div className="flex items-baseline justify-between"><Label>EXHIBIT {e.id} · VERIFIED QUOTATION</Label><span className="typed text-[11px]" style={{ color: BEARING_LABEL[e.bearing][1] }}>{BEARING_LABEL[e.bearing][0].toUpperCase()}</span></div>
+        {s?.image && (
+          <figure className="mt-4">
+            <img src={s.image.url} alt={`Lead image from ${s.publisher}`} className="max-h-[220px] w-full object-cover" referrerPolicy="no-referrer" />
+            <figcaption className="typed mt-1 text-[10.5px] text-[#6b5a3c]">{s.image.credit} · from the source’s own page</figcaption>
+          </figure>
+        )}
         <blockquote className="mt-4 font-serif text-[23px] leading-snug">“{e.quote}”</blockquote>
         <p className="mt-3 text-[12.5px] text-[#5a4a32]">The server matched this text word for word against the retrieved source before accepting it.</p>
         <dl className="typed mt-6 space-y-3 border-t border-[#8a7a5c]/40 pt-4 text-[12.5px]">
@@ -302,6 +321,98 @@ export function VerdictSheet({ c, live, onClose, onObjection }: { c: Case; live:
             <button disabled={busy || !arg.trim()} className="mt-3 inline-flex items-center gap-2 bg-[#a3302a] px-4 py-2 text-[14px] font-semibold text-paper disabled:opacity-40">{busy && <Loader2 size={14} className="animate-spin" />} File the objection</button>
             {err && <p role="alert" className="mt-2 text-[13px] text-[#a3302a]">{err}</p>}
           </form>
+        )}
+      </div>
+    </Sheet>
+  );
+}
+
+const DESKS: { role: Advocate; label: string }[] = [
+  { role: "investigator", label: "Investigation" },
+  { role: "prosecutor", label: "Prosecution" },
+  { role: "defender", label: "Defence" },
+];
+
+/**
+ * The editor's memo: the user's decision points. Live, every choice is real and steers the
+ * Mozaik agents. In a recording, only the recorded path exists, so the memo shows what was
+ * decided (and by whom) and offers to continue.
+ */
+export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
+  c: Case; live: boolean; onDecide: (d: import("../lib/api").EditorDecision) => Promise<void>; onContinue?: () => void; onClose: () => void;
+}) {
+  const open = c.leads.filter((l) => l.status === "open");
+  const [assign, setAssign] = useState<Record<string, Advocate | undefined>>({});
+  const [own, setOwn] = useState(""), [ownTo, setOwnTo] = useState<Advocate>("investigator");
+  const [busy, setBusy] = useState(false), [err, setErr] = useState<string | null>(null);
+  const afterInvestigation = c.pending === "after_investigation";
+  const picks = [
+    ...Object.entries(assign).filter(([, r]) => r).map(([leadId, r]) => ({ leadId, assignee: r! })),
+    ...(own.trim().length >= 8 ? [{ question: own.trim(), assignee: ownTo }] : []),
+  ];
+  const run = async (d: import("../lib/api").EditorDecision) => { setBusy(true); setErr(null); try { await onDecide(d); } catch (x) { setErr((x as Error).message); } finally { setBusy(false); } };
+  const chal = c.challenges.length, conceded = c.rebuttals.filter((r) => r.concede).length;
+  const recorded = !live;
+  // in a recording, the decision that followed this pause
+  const pauseAt = c.phaseLog.filter((p) => p.phase === "awaiting_editor").at(-1)?.at ?? 0;
+
+  return (
+    <Sheet onClose={onClose} label="Editor's decision" width={720} tilt={0.5}>
+      <div className="p-7" style={{ backgroundImage: "repeating-linear-gradient(transparent 0 29px, rgba(80,110,160,.18) 29px 30px)" }}>
+        <p className="typed text-[11px] text-[#a3302a]">EDITOR’S DESK · DECISION {afterInvestigation ? "1 OF 2" : "2 OF 2"}</p>
+        <h2 className="hand mt-1 text-[38px] leading-none text-[#2b241c]">Your call, editor.</h2>
+        <p className="mt-2 max-w-[56ch] text-[14.5px] text-[#3d3222]">
+          {afterInvestigation
+            ? `First reports are in: ${c.evidence.length} verified exhibits. The desks flagged ${open.length} lead${open.length === 1 ? "" : "s"}. Choose what to chase and who chases it: leads you assign to different desks are researched at the same time.`
+            : `Cross-examination is done: ${chal} challenge${chal === 1 ? "" : "s"}, ${conceded} conceded. Send it to the judge, or send someone back out first.`}
+        </p>
+
+        {recorded && (
+          <div className="mt-4 bg-white/60 p-4" style={{ boxShadow: "0 2px 6px rgba(60,40,20,.15)" }}>
+            <p className="typed text-[11px] text-[#8a5a1e]">RECORDED DECISION{c.autopilot ? " · TAKEN BY THE TEST AUTOPILOT, NOT A PERSON" : ""}</p>
+            <p className="mt-1 text-[14.5px]">{c.decisions.find((d) => d.at >= pauseAt)?.detail ?? "Continue to see what was decided."}</p>
+            <p className="mt-1 text-[12.5px] text-[#6b5a3c]">A recording can only follow the path that was actually taken. Open a live case to make this call yourself.</p>
+            <button onClick={onContinue} className="mt-3 bg-[#2b241c] px-5 py-2.5 text-[14px] font-semibold text-paper hover:bg-[#2f5f63]">Continue the recording</button>
+          </div>
+        )}
+
+        {(afterInvestigation || open.length > 0) && (
+          <ul className="mt-5 space-y-3">
+            {open.map((l) => (
+              <li key={l.id} className="p-3" style={{ background: "linear-gradient(#f6e7a6,#f1dd8c)", boxShadow: "0 3px 8px rgba(60,40,20,.2)" }}>
+                <p className="typed text-[10.5px] text-[#6b5a3c]">{l.id} · RAISED BY THE {l.by.toUpperCase()}</p>
+                <p className="hand text-[21px] leading-[1.05]">{l.question}</p>
+                <p className="mt-1 line-clamp-2 text-[12px] text-[#5a4a32]">{l.why}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="typed text-[11px] text-[#6b5a3c]">Assign to</span>
+                  {DESKS.map((d) => (
+                    <button key={d.role} disabled={recorded} onClick={() => setAssign((a) => ({ ...a, [l.id]: a[l.id] === d.role ? undefined : d.role }))}
+                      className={`rounded-full border px-2.5 py-0.5 text-[12.5px] disabled:opacity-50 ${assign[l.id] === d.role ? "border-[#2f5f63] bg-[#2f5f63] text-white" : "border-[#8a7a5c] hover:bg-white/50"}`}>{d.label}</button>
+                  ))}
+                </div>
+              </li>
+            ))}
+            {!recorded && (
+              <li className="bg-white/50 p-3">
+                <label className="typed text-[10.5px] text-[#6b5a3c]" htmlFor="own-lead">OR WRITE YOUR OWN LEAD</label>
+                <input id="own-lead" value={own} onChange={(e) => setOwn(e.target.value)} placeholder="e.g. What did the final ODIHR report conclude?" className="hand mt-1 w-full border-b border-[#8a7a5c] bg-transparent text-[22px] focus:outline-none" />
+                <div className="mt-2 flex flex-wrap gap-1.5">{DESKS.map((d) => <button key={d.role} onClick={() => setOwnTo(d.role)} className={`rounded-full border px-2.5 py-0.5 text-[12.5px] ${ownTo === d.role ? "border-[#2f5f63] bg-[#2f5f63] text-white" : "border-[#8a7a5c]"}`}>{d.label}</button>)}</div>
+              </li>
+            )}
+          </ul>
+        )}
+
+        {recorded ? null : (
+          <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-[#8a7a5c]/40 pt-4">
+            <button disabled={busy || !picks.length || picks.length > 3} onClick={() => run({ action: "pursue", leads: picks })} className="inline-flex items-center gap-2 bg-[#2f5f63] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#244c50] disabled:opacity-40">
+              {busy && <Loader2 size={14} className="animate-spin" />} {picks.length > 1 ? `Send out ${picks.length} leads (${new Set(picks.map((p) => p.assignee)).size} desks)` : "Send it out"}
+            </button>
+            {afterInvestigation
+              ? <button disabled={busy} onClick={() => run({ action: "proceed" })} className="px-3 py-2.5 text-[14px] underline underline-offset-4">Skip to cross-examination</button>
+              : <button disabled={busy} onClick={() => run({ action: "call_judge" })} className="bg-[#2b241c] px-5 py-2.5 text-[14px] font-semibold text-paper hover:bg-[#a3302a]">Send it to the judge</button>}
+            {picks.length > 3 && <span className="text-[12.5px] text-[#a3302a]">At most three leads at once.</span>}
+            {err && <p role="alert" className="w-full text-[13px] text-[#a3302a]">{err}</p>}
+          </div>
         )}
       </div>
     </Sheet>

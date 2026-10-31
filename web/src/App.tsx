@@ -83,6 +83,7 @@ export default function App() {
       <Scene c={c} live={!!view.caseId} recorded={view.demo} busy={busy} error={error ?? (view.demo ? replay.error : null)} liveCourt={liveCourt}
         onOpenCase={open} onDemo={demo} onObjection={raise}
         onRestartReplay={view.demo ? replay.restart : undefined}
+        replayT={replay.t} replayPaused={replay.paused} onResume={replay.resume}
         onTextView={() => go({ ...view, text: true })} />
       </ErrorBoundary>
       <AnimatePresence>{opening && <CaseOpened caseNo={opening.no} claim={opening.claim} />}</AnimatePresence>

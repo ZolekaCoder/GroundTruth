@@ -76,9 +76,14 @@ export function NightEdition({ c }: { c: Case | null }) {
     <div className="absolute" style={{ left: 440, top: 624, width: 150, height: 86, transform: "skewX(26deg) rotate(-3deg)", transformOrigin: "0 100%" }} aria-hidden>
       <div className="mat-paper absolute inset-0 overflow-hidden px-2 pt-1.5" style={{ filter: "brightness(.92) sepia(.15)" }}>
         <div className="text-center font-serif text-[11px] font-bold leading-none tracking-tight">The Ground Truth</div>
-        <div className="mt-0.5 border-y border-black/50 py-px text-center typed text-[4.5px]">NIGHT EDITION · {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }).toUpperCase()}</div>
-        <div className="mt-1 font-serif text-[8.5px] font-semibold leading-[1.05]">{c ? `On trial: “${c.claim.slice(0, 70)}${c.claim.length > 70 ? "…" : ""}”` : "Three elections in ten days. Every claim is a case."}</div>
-        <div className="mt-1 grid grid-cols-3 gap-1">{Array.from({ length: 9 }, (_, i) => <div key={i} className="h-[2px] bg-black/25" />)}</div>
+        <div className="mt-0.5 border-y border-black/50 py-px text-center typed text-[4.5px]">ELECTION EDITION · {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }).toUpperCase()}</div>
+        <div className="mt-1 grid grid-cols-[1.1fr_1fr] gap-1.5">
+          <div className="font-serif text-[8px] font-semibold leading-[1.05]">{c ? `On trial: “${c.claim.slice(0, 64)}${c.claim.length > 64 ? "…" : ""}”` : "Three elections in ten days. Every claim is a case."}</div>
+          {(() => { const img = c?.sources.find((s) => s.id === c.articleSourceId)?.image ?? c?.sources.find((s) => s.image)?.image; return img
+            ? <div className="relative h-[34px] overflow-hidden"><img src={img.url} alt="" className="halftone h-full w-full object-cover" referrerPolicy="no-referrer" /><div className="halftone-dots absolute inset-0" /></div>
+            : <div className="h-[34px] bg-[#8aa6b8]/60" />; })()}
+        </div>
+        <div className="mt-1 grid grid-cols-3 gap-1">{Array.from({ length: 6 }, (_, i) => <div key={i} className="h-[2px] bg-black/25" />)}</div>
       </div>
     </div>
   );

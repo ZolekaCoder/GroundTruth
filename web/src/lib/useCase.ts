@@ -25,6 +25,9 @@ export function useReplay(enabled: boolean, speed = 4) {
   const [error, setError] = useState<string | null>(null);
   const [t, setT] = useState(0);
   const start = useRef(0);
+  // decision points: the recording halts at each editor's decision until the viewer continues
+  const acknowledged = useRef(new Set<number>());
+  const [paused, setPaused] = useState<number | null>(null);
   useEffect(() => {
     if (!enabled) return;
     fetch("/sample-case.json").then((r) => (r.ok && r.headers.get("content-type")?.includes("json") ? r.json() : Promise.reject(new Error("No recorded case is bundled yet. With a funded model key, run `npm run record` to capture a real investigation.")))).then(setRecord).catch((e) => setError(e.message));
@@ -32,7 +35,15 @@ export function useReplay(enabled: boolean, speed = 4) {
   useEffect(() => {
     if (!record) return;
     start.current = performance.now();
-    const timer = setInterval(() => setT(record.openedAt + (performance.now() - start.current) * speed), 100);
+    acknowledged.current = new Set();
+    const stops = (record.phaseLog ?? []).map((p, i) => ({ ...p, i })).filter((p) => p.phase === "awaiting_editor");
+    const timer = setInterval(() => {
+      const raw = record.openedAt + (performance.now() - start.current) * speed;
+      const stop = stops.find((p) => !acknowledged.current.has(p.i) && raw >= p.at + 400);
+      if (stop) { setPaused(stop.i); setT(stop.at + 400); start.current = performance.now() - (stop.at + 400 - record.openedAt) / speed; return; }
+      setPaused(null);
+      setT(raw);
+    }, 100);
     return () => clearInterval(timer);
   }, [record, speed]);
 
@@ -43,13 +54,23 @@ export function useReplay(enabled: boolean, speed = 4) {
     const filings = upTo(record.filings);
     const turns = record.turns.filter((x) => x.startedAt <= t).map((x) => ({ ...x, endedAt: x.endedAt && x.endedAt <= t ? x.endedAt : undefined }));
     const busy = Object.fromEntries(turns.filter((x) => !x.endedAt).map((x) => [x.role, x.startedAt]));
-    const r2 = filings.filter((f) => f.round === 2).length;
-    const phase = verdicts.length ? "verdict" : r2 === 3 ? "deliberation" : filings.filter((f) => f.round === 1).length === 3 ? "cross_examination" : "investigation";
+    const log = (record.phaseLog ?? []).filter((p) => p.at <= t);
+    const last = log.at(-1);
+    const phase = last?.phase ?? "investigation";
+    // a lead's state at time t: assigned/reported only once those moments have passed
+    const leads = (record.leads ?? []).filter((l) => l.at <= t).map((l) => ({
+      ...l,
+      status: l.reportedAt && l.reportedAt <= t ? l.status : l.assignedAt && l.assignedAt <= t ? "assigned" : "open",
+      finding: l.reportedAt && l.reportedAt <= t ? l.finding : undefined,
+    })) as Case["leads"];
     return {
-      ...record, phase, round: phase === "investigation" ? 1 : 2, busy, turns, filings, verdicts,
+      ...record, phase, round: last?.round ?? 1, busy, turns, filings, verdicts, leads,
+      rebuttals: upTo(record.rebuttals ?? []), decisions: upTo(record.decisions ?? []), phaseLog: log,
+      pending: phase === "awaiting_editor" ? (log.filter((p) => p.phase === "awaiting_editor").length > 1 ? "before_verdict" : "after_investigation") : undefined,
       evidence: upTo(record.evidence), challenges: upTo(record.challenges), activity: upTo(record.activity),
       sources: record.sources.filter((s) => s.retrievedAt <= t),
     } as Case;
   }, [record, t]);
-  return { data, error, restart: () => { start.current = performance.now(); if (record) setT(record.openedAt); } };
+  const resume = () => { if (paused !== null) { acknowledged.current.add(paused); setPaused(null); } };
+  return { data, error, t, paused: paused !== null, resume, restart: () => { start.current = performance.now(); acknowledged.current = new Set(); setPaused(null); if (record) setT(record.openedAt); } };
 }

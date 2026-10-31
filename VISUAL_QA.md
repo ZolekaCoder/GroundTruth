@@ -97,3 +97,38 @@ It immediately reads as a room: back wall, evidence board, window onto a city, t
 - **Sound:** not implemented. It could not be made reliable and unobtrusive in the time available.
 - **Narrow screens** use a station strip instead of moving through the room freely.
 - **Impeccable critique** wasn't available, and **the reference images** were never received.
+
+
+---
+
+# Revision 2: daylight, people, evolving investigations
+
+All design iteration in this revision used the **recorded** investigation. The API was called once, to record a run that validates the new multi-stage backend (`server/src/scripts/prove-concurrency.ts`, with autopilot decisions).
+
+| Shot | What it showed | What changed next |
+|---|---|---|
+| `10-day-A-*` | Daylight room, people at desks, real OSCE photos on report-style clippings, handwritten leads, the replay stopping at decision 1. **Problems:** illegible HUD wordmark on the light wall, with the clock on top of it. Pendant cords slicing the board. Walking reporters at full size beside the wall. Long "why" text in the memo. | HUD wordmark on a chip; lamps removed; clock moved above the board; walkers shrink with distance; why-text clamped |
+| `11-day-B-*` | Journeys failed after decision stops were added. **This was the test, not the app:** recordings now wait at each decision. The test was updated to treat decisions as journey steps, and all steps passed. **Visual problems:** faceless "mannequin" heads, white blocks at the desk fronts, heavy chairs. | Profile faces (brow, eye, nose, mouth); wire in-trays; smaller chairs |
+| `12-day-C-*` | 1920: walkers, speech bubbles, typing, an editor at the window; the room feels inhabited. **Problems:** every walker headed for the same wall spot; HUD chips pile up at 390px. | A pin spot per desk; compact mobile HUD |
+| `13-day-D-*` | All 11 journey steps pass, 0 console errors. The evidence sheet carries the source's own photo with a credit. **Problem:** in a recording, the memo's "Continue" sat below the fold. | Recorded decision moved to the top of the memo |
+| `14-live-memo-layout-1440` | The **live** memo (rendered over the recording via a temporary QA flag that has since been removed, with no API call): two agent leads assigned to different desks, one lead written by the editor. **Problem:** the button said "3 desks" for two desks. | Label now counts leads and desks |
+
+## Scores, revision 2
+
+| Criterion | Score | Why |
+|---|---|---|
+| Environmental immersion | **4/5** | A bright, specific place: sunlit city, plants, rug, a clock showing the real time, people. Still an illustration, not photography. |
+| Architectural depth | **4/5** | Foreground desks and reporters, the table and rug, the wall and window. Walkers scale with distance. |
+| Material realism | **3.5/5** | Real photographs from the sources lift the documents considerably. Furniture and people are flat-shaded vector shapes. |
+| Visual originality | **4/5** | Editorial illustration plus real press photos and handwritten notes. Not a dashboard. |
+| Interaction clarity | **4/5** | The memo makes decisions explicit, and the HUD prompts "Your call, editor". |
+| Product relevance | **4.5/5** | Serbia, the US and South Africa dossiers on the map. The flagship run reads the OSCE report and chases its final report as a lead. |
+| Functional integrity | **5/5** | Multi-stage backend validated live, and every journey passes on the recording. |
+| Overall polish | **3.5/5** | Cohesive and lively. The people are deliberately simple, and there is no sound. |
+
+## Not done
+
+- **No sound.**
+- **People are simple vector figures** with a handful of poses, not animated characters.
+- **Comparing two outlets side by side** isn't built. Readers compare reporting by objecting with a second source.
+- **The live memo's buttons haven't been clicked against a live case in the UI.** The decision logic itself (`decide()`) ran live via autopilot, and the HTTP endpoint is a thin wrapper, checked for input validation.

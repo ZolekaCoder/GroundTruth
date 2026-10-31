@@ -20,7 +20,13 @@ await step("2 open a country dossier", async () => {
 await step("3 replay the genuine recorded case", async () => {
   await page.getByRole("button", { name: "Replay the recorded investigation" }).click();
   await page.getByText("Recorded investigation", { exact: true }).waitFor();
-  await page.waitForTimeout(7000); await shot("03-agents-working");
+  await page.waitForTimeout(3500); await shot("03-agents-working");
+});
+await step("3b editor decision point 1 (recording halts for the user)", async () => {
+  await page.getByRole("dialog", { name: "Editor's decision" }).waitFor({ timeout: 30000 });
+  await page.waitForTimeout(1200); await shot("03b-editor-decision");
+  await page.getByRole("button", { name: "Continue the recording" }).click();
+  await page.waitForTimeout(4500); await shot("03c-leads-in-progress");
 });
 await step("4 agents activate and outputs appear (agent file)", async () => {
   await page.getByRole("button", { name: /The Prosecutor: open their file/ }).click();
@@ -31,8 +37,13 @@ await step("6 return to the room", async () => {
   await page.keyboard.press("Escape"); await page.keyboard.press("Escape");
   await page.getByText("Click the map, the case folder, a monitor or the wall").waitFor();
 });
+await step("3d editor decision point 2", async () => {
+  await page.getByRole("dialog", { name: "Editor's decision" }).waitFor({ timeout: 40000 });
+  await shot("03d-editor-decision-2");
+  await page.getByRole("button", { name: "Continue the recording" }).click();
+});
 await step("7a verdict reached (wall auto-focus)", async () => {
-  await page.getByRole("button", { name: /RULING OF THE COURT/i }).waitFor({ timeout: 30000 });
+  await page.getByRole("button", { name: /RULING OF THE COURT/i }).waitFor({ timeout: 40000 });
   await page.waitForTimeout(2500); await shot("05-wall");
 });
 await step("5 evidence can be inspected", async () => {

@@ -15,7 +15,7 @@ process.on("unhandledRejection", (r) => { console.error("turn failed:", (r as Er
 initializeRuntime({ state: new CourtState() });
 const claim = process.argv[2] ?? "The Great Wall of China is visible from space with the naked eye.";
 const url = process.argv[4]; // optional article the claim is checked against
-const c = await openCase({ claim, url });
+const c = await openCase({ claim, url }, { autopilot: true }); // the clerk takes the editor's decisions
 console.log(`Case ${c.id} opened: "${claim}"`);
 
 const t0 = c.openedAt;
@@ -37,6 +37,10 @@ for (const [, d] of points) { open += d; peak = Math.max(peak, open); }
 console.log(`\nPeak concurrent agent turns: ${peak}`);
 console.log(`Evidence entered (all quotes verified verbatim): ${k.evidence.length} from ${k.sources.length} sources`);
 for (const f of k.filings) console.log(`  R${f.round} ${f.role}: ${f.stance} ${f.confidence}%${f.changed ? "  ← CHANGED" : ""}`);
+console.log("Stages:", k.phaseLog.map((p) => p.phase).join(" → "));
+for (const l of k.leads) console.log(`  ${l.id} [${l.status}] by ${l.by}${l.assignee ? ` → ${l.assignee}` : ""}: ${l.question.slice(0, 90)}`);
+for (const r of k.rebuttals) console.log(`  rebuttal ${r.challengeId} by ${r.by}: ${r.concede ? "CONCEDED" : "rebutted"}`);
+for (const d of k.decisions) console.log(`  editor: ${d.detail}`);
 const v = k.verdicts.at(-1);
 console.log(done && v ? `\nVERDICT: ${v.verdict.toUpperCase()} (${v.confidence}%) — ${v.headline}` : `\nNo verdict: ${k.error ?? "timed out"}`);
 const out = process.argv[3];

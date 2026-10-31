@@ -1,4 +1,46 @@
-# The Night Shift: visual direction
+# The Ground Truth newsroom: visual direction
+
+> **Revision (daylight).** The first pass was set at night (walnut, tungsten, graphite). Feedback: too dark, too brown, lifeless. The room is now in **natural daylight**, and the palette and people below supersede the night palette further down, which is kept for history.
+
+## Daylight palette
+
+| Token | Hex | Where |
+|---|---|---|
+| plaster | `#ece4d4` | walls in daylight |
+| teal | `#2f5f63` | panelling, assigned-lead stamps, decision buttons |
+| oak | `#b8875a` | table, desks, floor |
+| terracotta | `#c4683f` | pots, rug, facades |
+| ochre | `#d9a441` | facades, the Investigator |
+| sky | `#9fcbe6` | the window |
+| leaf | `#4f7d4a` | plants, street trees |
+| alarm red | `#a3302a` | contradictions and challenges only |
+
+There is also a handwriting face (**Caveat**) for human marks: leads, speech, wing labels and the editor's memo.
+
+## People
+
+Each Mozaik agent is an illustrated reporter, labelled as an AI agent, never presented as a real person:
+
+- **The Prosecutor:** red blazer and curls.
+- **The Defender:** olive cardigan and beard.
+- **The Investigator:** ochre sweater and glasses.
+- **The Judge:** the editor-in-chief, navy suit and silver hair.
+
+Every pose comes from case data: typing (the agent's loop is running), on the phone (chasing an assigned lead), walking a clipping to the wall (a quote was just verified), speech bubbles (a challenge, a rebuttal or concession, a new lead). The editor-in-chief waits by the window and walks to the wall when the case reaches the bench.
+
+## Documents
+
+A clipping's form follows its source:
+
+- **Press clipping:** for sources with a lead image, the photo is printed halftone with its credit.
+- **Report page:** for `.org`, `.gov` and `.int` sources, with a header band and the quote in yellow highlighter.
+- **Web printout:** everything else, with an address bar.
+
+Leads are yellow index cards, handwritten and stamped OPEN LEAD, ON IT, FOLLOWED UP or DEAD END. Images are each source's own `og:image` or Wikipedia page image, credited on the evidence sheet.
+
+---
+
+# Original night direction (superseded)
 
 The Ground Truth is a place, not a page. The user is an investigative editor walking into a newsroom at
 night during the October–November 2026 election period. Everything the product does happens somewhere

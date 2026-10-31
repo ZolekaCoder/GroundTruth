@@ -4,14 +4,16 @@ import { ArrowLeft, FileText, Radio, RotateCcw } from "lucide-react";
 import type { Advocate, Case } from "../lib/types";
 import type { Dossier } from "../lib/elections";
 import { findTestClaim } from "../lib/elections";
-import { ArchiveShelves, BackWall, Chairs, CityWindow, Floor, Lightmap, PendantLamp, STAGE, TableTop } from "./room";
+import { ArchiveShelves, BackWall, Chairs, CityWindow, Floor, Lightmap, Plant, STAGE, TableTop, WallClock } from "./room";
+import { Newsroom } from "./People";
+import { decide, type EditorDecision } from "../lib/api";
 import { CaseFolder, DeskNote, ElectionMap, NightEdition } from "./TableProps";
 import { Workstation } from "./Workstation";
 import { EvidenceWall } from "./EvidenceWall";
-import { AgentFile, CaseSheet, DossierFolder, EvidenceSheet, SourceSheet, VerdictSheet } from "./Papers";
+import { AgentFile, CaseSheet, DossierFolder, EditorMemo, EvidenceSheet, SourceSheet, VerdictSheet } from "./Papers";
 
 type Focus = "overview" | "table" | "desk" | "wall" | Advocate;
-type Overlay = null | { kind: "dossier"; id: Dossier["id"] } | { kind: "case" } | { kind: "agent"; role: Advocate } | { kind: "evidence"; id: string } | { kind: "source"; id: string } | { kind: "verdict" };
+type Overlay = null | { kind: "editor" } | { kind: "dossier"; id: Dossier["id"] } | { kind: "case" } | { kind: "agent"; role: Advocate } | { kind: "evidence"; id: string } | { kind: "source"; id: string } | { kind: "verdict" };
 
 const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }> = {
   overview: { cx: 800, cy: 450, z: 1, label: "The newsroom" },
@@ -25,8 +27,9 @@ const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }
 
 const reduceMotion = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, onDemo, onObjection, onRestartReplay, onTextView }: {
+export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, onDemo, onObjection, onRestartReplay, onTextView, replayT, replayPaused, onResume }: {
   c: Case | null; live: boolean; recorded: boolean; busy: boolean; error: string | null; liveCourt: boolean | null;
+  replayT?: number; replayPaused?: boolean; onResume?: () => void;
   onOpenCase: (input: { claim?: string; url?: string }) => Promise<boolean>; onDemo: () => void;
   onObjection: (arg: string, url?: string) => Promise<void>; onRestartReplay?: () => void; onTextView?: () => void;
 }) {
@@ -36,6 +39,17 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
   const [px, setPx] = useState({ x: 0, y: 0 });
   const [toast, setToast] = useState<string | null>(null);
   const verdictCount = useRef(c?.verdicts.length ?? 0);
+  // the room's clock: real time for a live case, the replay's own clock for a recording
+  const [tick, setTick] = useState(Date.now());
+  useEffect(() => { if (!live) return; const iv = setInterval(() => setTick(Date.now()), 400); return () => clearInterval(iv); }, [live]);
+  const now = recorded ? replayT ?? 0 : tick;
+  // the editor's decision points: walk to the wall and put the memo on the desk
+  const pauseKey = c?.phase === "awaiting_editor" ? `${c.id}:${c.phaseLog.filter((p) => p.phase === "awaiting_editor").length}` : null;
+  useEffect(() => {
+    if (!pauseKey) return;
+    setFocus("wall"); setOverlay({ kind: "editor" });
+    setToast("Your call, editor.");
+  }, [pauseKey]);
 
   useLayoutEffect(() => { const f = () => setVp({ w: innerWidth, h: innerHeight }); addEventListener("resize", f); return () => removeEventListener("resize", f); }, []);
   const back = useCallback(() => { setOverlay(null); setFocus("overview"); }, []);
@@ -75,14 +89,16 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
   const working = c ? Object.keys(c.busy).length : 0;
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#17120d]" onPointerMove={(e) => parallax && setPx({ x: (e.clientX / vp.w - 0.5) * 2, y: (e.clientY / vp.h - 0.5) * 2 })}>
+    <div className="fixed inset-0 overflow-hidden bg-[#e9e1d2]" onPointerMove={(e) => parallax && setPx({ x: (e.clientX / vp.w - 0.5) * 2, y: (e.clientY / vp.h - 0.5) * 2 })}>
       <div className="world absolute left-0 top-0" data-focus={focus} style={{ width: STAGE.w, height: STAGE.h, transform: `translate(${tx}px, ${ty}px) scale(${s})` }}>
         {/* background */}
         <div className="absolute inset-0" style={layer(-5)}>
           <BackWall />
           <CityWindow />
           <ArchiveShelves />
+          <WallClock x={812} y={-4} />
           <Floor />
+          <Plant x={1450} y={300} s={0.82} />
         </div>
         {/* the evidence wall */}
         <div className="absolute inset-0" style={layer(-3)}>
@@ -106,16 +122,12 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
         <Lightmap />
         {/* emitters sit above the lightmap: lamps and the investigator's screen */}
         <div className="absolute inset-0" style={layer(2)}>
-          {/* lamps step out of the way (soften) when the camera moves in to read something */}
-          <div className="station absolute inset-0" data-active={focus === "table" || undefined}>
-            <PendantLamp x={548} shadeY={300} landY={640} spread={220} />
-            <PendantLamp x={1052} shadeY={300} landY={640} spread={220} />
-          </div>
           <Workstation role="investigator" c={c} active={focus === "investigator"} onOpen={() => go("investigator", { kind: "agent", role: "investigator" })} />
         </div>
         {/* foreground desks, cropped by the frame */}
         <div className="absolute inset-0" style={layer(9)}>
           <div className="station absolute inset-0"><Chairs /></div>
+          <Newsroom c={c} now={now} />
           <Workstation role="prosecutor" c={c} active={focus === "prosecutor"} onOpen={() => go("prosecutor", { kind: "agent", role: "prosecutor" })} />
           <Workstation role="defender" c={c} active={focus === "defender"} onOpen={() => go("defender", { kind: "agent", role: "defender" })} />
         </div>
@@ -133,15 +145,17 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
       </div>
 
       {/* lens: vignette and warm grade, in screen space */}
-      <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(12,8,5,.75) 100%)" }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(130% 100% at 55% 45%, transparent 62%, rgba(60,40,22,.28) 100%)" }} />
 
       {/* HUD: small, at the edges */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 sm:p-5">
         <div className="pointer-events-auto">
-          <p className="font-serif text-[19px] font-semibold leading-none text-paper">The Ground Truth</p>
-          <p className="typed mt-1 text-[11.5px] text-paper/60">Night shift · {cam.label}</p>
+          <div className="inline-block bg-[#1b1611]/85 px-3 py-2" style={{ boxShadow: "0 4px 12px rgba(0,0,0,.25)" }}>
+            <p className="whitespace-nowrap font-serif text-[17px] font-semibold leading-none text-paper sm:text-[19px]">The Ground Truth</p>
+            <p className="typed mt-1 hidden text-[11px] text-paper/70 sm:block">Election desk · {cam.label}</p>
+          </div>
           {focus !== "overview" && (
-            <button onClick={back} className="hint mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper hover:bg-[#2b241c]">
+            <button onClick={back} className="hint mt-2 flex items-center gap-1.5 rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper hover:bg-[#2b241c]">
               <ArrowLeft size={14} /> Back to the room <span className="typed text-paper/50">Esc</span>
             </button>
           )}
@@ -150,19 +164,19 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
           {recorded ? (
             <div className="hint flex flex-wrap items-center justify-end gap-2 bg-[#e8dcbf] px-3 py-1.5 text-[#2b241c]" style={{ boxShadow: "0 4px 10px rgba(0,0,0,.4)" }}>
               <strong className="font-semibold">Recorded investigation</strong>
-              <span className="typed text-[11px]">a real run, {c ? new Date(c.openedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : ""} · replayed 4×</span>
+              <span className="typed hidden text-[11px] sm:inline">a real run, {c ? new Date(c.openedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : ""} · {replayPaused ? "paused at a decision" : "replayed 4×"}{c?.autopilot ? " · editor decisions by test autopilot" : ""}</span>
               {onRestartReplay && <button onClick={onRestartReplay} className="inline-flex items-center gap-1 underline"><RotateCcw size={12} /> Replay</button>}
             </div>
           ) : c ? (
             <div className="hint flex items-center gap-2 rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper">
               {c.phase !== "verdict" && c.phase !== "failed" && <Radio size={13} className="animate-pulse text-[#e6a95c]" />}
-              Live case · {c.phase.replace("_", "-")}{working ? ` · ${working} agents working` : ""}
+              Live case · {c.phase === "awaiting_editor" ? "waiting for your decision" : c.phase.replace("_", "-")}{working ? ` · ${working} agents working` : ""}
             </div>
           ) : (
             <div className="hint rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper/80">{liveCourt === false ? "Court offline · recordings only" : "Court in session"}</div>
           )}
-          {synthetic && <div className="hint bg-[#1b1611]/85 px-3 py-1 text-[#e6c48f]">Synthetic test claim ({synthetic.country} dossier), not attributed to anyone</div>}
-          {c && onTextView && <button onClick={onTextView} className="hint inline-flex items-center gap-1.5 text-paper/70 underline-offset-2 hover:text-paper hover:underline"><FileText size={13} /> Text view of this case</button>}
+          {synthetic && <div className="hint bg-[#1b1611]/85 px-3 py-1 text-[#e6c48f]">Synthetic test claim<span className="hidden sm:inline"> ({synthetic.country} dossier), not attributed to anyone</span></div>}
+          {c && onTextView && <button onClick={onTextView} className="hint hidden sm:inline-flex items-center gap-1.5 text-paper/70 underline-offset-2 hover:text-paper hover:underline"><FileText size={13} /> Text view of this case</button>}
         </div>
       </header>
 
@@ -174,9 +188,12 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
           </motion.p>
         )}
       </AnimatePresence>
+      {!overlay && c?.phase === "awaiting_editor" && (
+        <button onClick={() => { setFocus("wall"); setOverlay({ kind: "editor" }); }} className="hint absolute bottom-24 left-1/2 -translate-x-1/2 rounded-full bg-[#a3302a] px-4 py-2 text-white shadow-lg">Your call, editor: open the memo</button>
+      )}
       {!overlay && (
-        <p className="hint pointer-events-none absolute bottom-4 left-1/2 w-max max-w-[92vw] -translate-x-1/2 text-center text-paper/55">
-          {focus === "overview" ? "Click the map, the case folder, a monitor or the wall" : focus === "wall" ? "Open any pinned document · the ruling appears here when it's ready" : focus === "table" ? "Choose a brass pin to open that election’s dossier" : "Esc returns to the room"}
+        <p className="hint pointer-events-none absolute bottom-4 left-1/2 w-max max-w-[92vw] -translate-x-1/2 rounded-full bg-[#1b1611]/60 px-3 py-1 text-center text-paper/90">
+          {c?.phase === "awaiting_editor" ? "The desks are waiting on you" : focus === "overview" ? "Click the map, the case folder, a monitor or the wall" : focus === "wall" ? "Open any pinned document · the ruling appears here when it's ready" : focus === "table" ? "Choose a brass pin to open that election’s dossier" : "Esc returns to the room"}
         </p>
       )}
 
@@ -191,6 +208,11 @@ export function Scene({ c, live, recorded, busy, error, liveCourt, onOpenCase, o
       {/* documents */}
       <div className={`pointer-events-none absolute inset-0 flex items-center p-4 ${wide ? "justify-end pr-8" : "justify-center"}`}>
         <AnimatePresence mode="wait">
+          {overlay?.kind === "editor" && c && c.phase === "awaiting_editor" && (
+            <EditorMemo key={`ed-${pauseKey}`} c={c} live={live} onClose={() => setOverlay(null)}
+              onContinue={() => { onResume?.(); setOverlay(null); setFocus("overview"); }}
+              onDecide={async (d: EditorDecision) => { await decide(c.id, d); setOverlay(null); setFocus("overview"); setToast(d.action === "call_judge" ? "Sent to the judge." : d.action === "proceed" ? "Straight to cross-examination." : "The desks are on it."); }} />
+          )}
           {overlay?.kind === "dossier" && <DossierFolder key={`d-${overlay.id}`} id={overlay.id} busy={busy} live={liveCourt} error={error} onClose={() => setOverlay(null)} onOpenCase={openCase} onDemo={() => { onDemo(); go("overview"); }} />}
           {overlay?.kind === "case" && <CaseSheet key="case" c={c} busy={busy} live={liveCourt} error={error} onClose={() => setOverlay(null)} onOpenCase={openCase} />}
           {overlay?.kind === "agent" && <AgentFile key={`a-${overlay.role}`} role={overlay.role} c={c} onClose={() => setOverlay(null)} onEvidence={(id) => go("wall", { kind: "evidence", id })} />}

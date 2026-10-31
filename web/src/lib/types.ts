@@ -1,20 +1,24 @@
 export type Advocate = "prosecutor" | "defender" | "investigator";
 export type Role = Advocate | "judge";
 export type Stance = "supported" | "contradicted" | "misleading" | "insufficient";
-export type Phase = "opening" | "investigation" | "cross_examination" | "deliberation" | "verdict" | "objection" | "failed";
+export type Phase = "opening" | "investigation" | "awaiting_editor" | "leads" | "cross_examination" | "rebuttal" | "deliberation" | "verdict" | "objection" | "failed";
 
-export type Source = { id: string; url: string; title: string; publisher: string; retrievedAt: number; published?: string; readBy: Role[]; length: number };
+export type Source = { id: string; url: string; title: string; publisher: string; retrievedAt: number; published?: string; readBy: Role[]; length: number; image?: { url: string; credit: string } };
 export type Evidence = { id: string; sourceId: string; url: string; title: string; publisher: string; quote: string; bearing: "supports" | "undermines" | "context"; relevance: string; citedBy: Role; at: number; round: number };
 export type Filing = { role: Advocate; round: number; stance: Stance; confidence: number; argument: string; evidenceIds: string[]; changed: boolean; whatChanged?: string; at: number; timedOut?: boolean };
-export type Challenge = { id: string; from: Advocate; to: Advocate; kind?: "factual" | "framing"; point: string; evidenceIds: string[]; at: number };
+export type Challenge = { id: string; round?: number; from: Advocate; to: Advocate; kind?: "factual" | "framing"; point: string; evidenceIds: string[]; at: number };
 export type Verdict = { round: number; verdict: Stance; confidence: number; headline: string; summary: string; reasoning: string; keyEvidenceIds: string[]; uncertainties: string[]; framingNotes?: string[]; at: number };
 export type Activity = { id: string; role: Role | "clerk"; kind: "thinking" | "tool" | "said" | "error" | "phase"; text: string; at: number };
 export type Objection = { round: number; argument: string; url?: string; at: number };
+export type Lead = { id: string; by: Advocate | "editor"; question: string; why: string; at: number; round: number; status: "open" | "assigned" | "reported" | "dropped"; assignee?: Advocate; assignedAt?: number; finding?: string; evidenceIds?: string[]; reportedAt?: number };
+export type Rebuttal = { id: string; challengeId: string; by: Advocate; response: string; concede: boolean; at: number; timedOut?: boolean };
+export type Decision = { at: number; action: "pursue" | "proceed" | "call_judge" | "objection"; detail: string };
 
 export type Case = {
   id: string; claim: string; articleUrl?: string; articleSourceId?: string; openedAt: number; phase: Phase; round: number;
   sources: Source[]; evidence: Evidence[]; filings: Filing[]; challenges: Challenge[]; verdicts: Verdict[]; objections: Objection[];
-  activity: Activity[]; busy: Partial<Record<Role, number>>; turns: { role: Role; round: number; startedAt: number; endedAt?: number }[]; error?: string;
+  activity: Activity[]; leads: Lead[]; rebuttals: Rebuttal[]; decisions: Decision[]; phaseLog: { phase: Phase; round: number; at: number }[];
+  pending?: "after_investigation" | "before_verdict"; autopilot?: boolean; busy: Partial<Record<Role, number>>; turns: { role: Role; round: number; startedAt: number; endedAt?: number }[]; error?: string;
 };
 
 export const ADVOCATES: Advocate[] = ["prosecutor", "defender", "investigator"];

@@ -8,16 +8,19 @@ function decode(s: string) {
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 
-export function htmlToText(html: string): { title: string; text: string; published?: string } {
+export function htmlToText(html: string, base?: string): { title: string; text: string; published?: string; image?: string } {
   const title = decode(html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)/i)?.[1]
     ?? html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "").trim();
   const published = html.match(/<meta[^>]+(?:property|name)=["'](?:article:published_time|date|pubdate)["'][^>]+content=["']([^"']+)/i)?.[1];
+  const og = html.match(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)/i)?.[1] ?? html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)?.[1];
+  let image: string | undefined;
+  try { image = og ? new URL(decode(og), base).toString() : undefined; } catch { image = undefined; }
   const body = html
     .replace(/<(script|style|noscript|svg|nav|footer|header|aside|form)[\s\S]*?<\/\1>/gi, " ")
     .replace(/<\/(p|h[1-6]|li|blockquote|div|br)>/gi, "\n")
     .replace(/<[^>]+>/g, " ");
   const text = decode(body).split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter((l) => l.length > 40).join("\n");
-  return { title, text, published };
+  return { title, text, published, image };
 }
 
 /** Normalise for quote verification: case, whitespace and typographic punctuation. */
@@ -60,13 +63,13 @@ export async function searchWikipedia(query: string) {
 async function fetchWikipedia(url: string) {
   const title = decodeURIComponent(new URL(url).pathname.split("/wiki/")[1] ?? "");
   const u = new URL("https://en.wikipedia.org/w/api.php");
-  u.search = new URLSearchParams({ action: "query", prop: "extracts|revisions", explaintext: "1", redirects: "1", titles: title, rvprop: "timestamp", format: "json", origin: "*" }).toString();
+  u.search = new URLSearchParams({ action: "query", prop: "extracts|revisions|pageimages", explaintext: "1", redirects: "1", titles: title, rvprop: "timestamp", piprop: "thumbnail", pithumbsize: "640", format: "json", origin: "*" }).toString();
   const res = await fetch(u, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Wikipedia fetch failed (${res.status})`);
   const data: any = await res.json();
   const page: any = Object.values(data.query?.pages ?? {})[0];
   if (!page || page.missing !== undefined || !page.extract) throw new Error(`No Wikipedia article found for "${title}"`);
-  return { title: page.title as string, text: page.extract as string, published: page.revisions?.[0]?.timestamp as string | undefined };
+  return { title: page.title as string, text: page.extract as string, published: page.revisions?.[0]?.timestamp as string | undefined, image: page.thumbnail?.source as string | undefined };
 }
 
 export async function fetchSource(c: Case, url: string, by: Role | "clerk"): Promise<Source> {
@@ -75,13 +78,13 @@ export async function fetchSource(c: Case, url: string, by: Role | "clerk"): Pro
     if (by !== "clerk" && !existing.readBy.includes(by)) existing.readBy.push(by);
     return existing;
   }
-  let parsed: { title: string; text: string; published?: string };
+  let parsed: { title: string; text: string; published?: string; image?: string };
   if (/^https?:\/\/[a-z]+\.wikipedia\.org\/wiki\//.test(url)) {
     parsed = await fetchWikipedia(url);
   } else {
     const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "text/html" }, signal: AbortSignal.timeout(12_000), redirect: "follow" });
     if (!res.ok) throw new Error(`Could not retrieve ${url} (HTTP ${res.status})`);
-    parsed = htmlToText(await res.text());
+    parsed = htmlToText(await res.text(), res.url || url);
     if (parsed.text.length < 200) throw new Error(`Retrieved ${url} but it contained almost no readable text (paywall or script-rendered page).`);
   }
   const source: Source = {
@@ -93,6 +96,7 @@ export async function fetchSource(c: Case, url: string, by: Role | "clerk"): Pro
     published: parsed.published,
     text: parsed.text.slice(0, 200_000),
     readBy: by === "clerk" ? [] : [by],
+    image: parsed.image ? { url: parsed.image, credit: /wikipedia\.org/.test(url) ? "Image via Wikipedia / Wikimedia Commons" : `Image: ${publisherOf(url)}` } : undefined,
   };
   c.sources.push(source);
   return source;

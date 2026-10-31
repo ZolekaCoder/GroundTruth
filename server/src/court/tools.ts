@@ -3,10 +3,12 @@ import { SemanticEvent, type Tool } from "@mozaik-ai/core";
 import { getCase, sendEvent } from "./runtime.js";
 import { excerpt, fetchSource, quoteIsGrounded, searchWikipedia } from "./sources.js";
 import { log, publish } from "./bus.js";
-import { ADVOCATES, type Advocate, type Bearing, type Filing, type Role, type Stance, type Verdict } from "./types.js";
+import { ADVOCATES, type Advocate, type Bearing, type Filing, type Lead, type Role, type Stance, type Verdict } from "./types.js";
 
 export const FILING_EVENT = "court.filing";
 export const VERDICT_EVENT = "court.verdict";
+export const LEAD_EVENT = "court.lead_report";
+export const REBUTTAL_EVENT = "court.rebuttal";
 
 const STANCES: Stance[] = ["supported", "contradicted", "misleading", "insufficient"];
 
@@ -100,10 +102,45 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
       },
       async ({ target, kind, point, evidence_ids }) => {
         const k = c();
-        if (k.round < 2) return "Challenges are only allowed during cross-examination.";
-        k.challenges.push({ id: randomUUID(), from: role, to: target, kind: kind === "framing" ? "framing" : "factual", point, evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)), at: Date.now() });
+        if (k.phase !== "cross_examination" && k.phase !== "objection") return "Challenges are only allowed during cross-examination.";
+        k.challenges.push({ id: `C${k.challenges.length + 1}`, round: k.round, from: role, to: target, kind: kind === "framing" ? "framing" : "factual", point, evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)), at: Date.now() });
         log(k, role, "said", `${kind === "framing" ? "Framing" : "Factual"} objection to the ${target}: ${point}`);
         return "Challenge recorded.";
+      }),
+    fn("raise_lead", "Record a question worth separate investigation (a source to trace, a figure to check, missing context). The editor decides which leads get pursued and by whom. At most 2 per round.",
+      { question: { type: "string", description: "The lead, as a concrete research question" }, why: { type: "string", description: "One sentence: why it could change the outcome" } },
+      async ({ question, why }) => {
+        const k = c();
+        if (!["investigation", "cross_examination", "objection"].includes(k.phase)) return "Leads can be raised while investigating or cross-examining.";
+        if (k.leads.filter((l) => l.by === role && l.round === k.round).length >= 2) return "You already raised 2 leads this round.";
+        const lead: Lead = { id: `L${k.leads.length + 1}`, by: role, question: question.slice(0, 240), why: why.slice(0, 240), at: Date.now(), round: k.round, status: "open" };
+        k.leads.push(lead);
+        log(k, role, "said", `Raised lead ${lead.id}: ${lead.question}`);
+        return `Lead ${lead.id} recorded for the editor.`;
+      }),
+    fn("report_lead", "Report what you found on a lead the editor assigned to you. Call once per assigned lead, after researching it. A lead that goes nowhere is a valid finding.",
+      { lead_id: { type: "string" }, finding: { type: "string", description: "What the evidence shows, under 70 words, citing evidence ids" }, evidence_ids: { type: "array", items: { type: "string" } } },
+      async ({ lead_id, finding, evidence_ids }) => {
+        const k = c();
+        const lead = k.leads.find((l) => l.id === lead_id);
+        if (!lead || lead.assignee !== role || lead.status !== "assigned") return "That lead is not assigned to you, or is already reported.";
+        Object.assign(lead, { status: "reported", finding, evidenceIds: evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)), reportedAt: Date.now() });
+        log(k, role, "said", `Reported on ${lead.id}`);
+        sendEvent(SemanticEvent.create(LEAD_EVENT, agentId(), { caseId, round: k.round, role, leadId: lead.id }), agentId());
+        return "Lead reported. If you have no other assigned leads, reply with one short sentence and stop.";
+      }),
+    fn("rebut", "Respond to a challenge made against your position. Concede when the challenge is right.",
+      { challenge_id: { type: "string" }, response: { type: "string", description: "Under 60 words" }, concede: { type: "boolean" } },
+      async ({ challenge_id, response, concede }) => {
+        const k = c();
+        if (k.phase !== "rebuttal") return "Rebuttals happen in the rebuttal stage.";
+        const ch = k.challenges.find((x) => x.id === challenge_id);
+        if (!ch || ch.to !== role) return "That challenge was not made against you.";
+        if (k.rebuttals.some((r) => r.challengeId === ch.id)) return "Already answered.";
+        k.rebuttals.push({ id: randomUUID(), challengeId: ch.id, by: role, response, concede: !!concede, at: Date.now() });
+        log(k, role, "said", `${concede ? "Concedes" : "Rebuts"} ${ch.id} from the ${ch.from}`);
+        sendEvent(SemanticEvent.create(REBUTTAL_EVENT, agentId(), { caseId, round: k.round, role }), agentId());
+        return "Recorded.";
       }),
     fn("file_position", "File your position for this round. Call exactly once per round, after researching. This ends your research for the round.",
       {
@@ -117,6 +154,7 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
         const k = c();
         const stance = asStance(rawStance);
         if (!stance) return `Rejected: stance must be one of ${STANCES.join(", ")}.`;
+        if (!["investigation", "cross_examination", "objection"].includes(k.phase)) return "No position is due in this stage. Use the stage's own tool (report_lead or rebut).";
         if (k.filings.some((f) => f.role === role && f.round === k.round)) return "You already filed this round.";
         const prev = [...k.filings].reverse().find((f) => f.role === role);
         const filing: Filing = {

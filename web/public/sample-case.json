@@ -1,23 +1,44 @@
 {
-  "id": "40c952a8-5524-40df-9528-cecf6b67339d",
+  "id": "56ac1bd0-37c4-4028-92a0-3aacd6166a95",
   "claim": "International observers gave Serbia’s 25 October 2026 election a positive assessment, praising high voter turnout and vigorous competition.",
   "articleUrl": "https://odihr.osce.org/node/666908",
-  "openedAt": 1793471783615,
+  "openedAt": 1793475576803,
   "phase": "verdict",
-  "round": 2,
+  "round": 4,
   "sources": [
     {
       "id": "S1",
       "url": "https://odihr.osce.org/node/666908",
       "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
       "publisher": "odihr.osce.org",
-      "retrievedAt": 1793471784720,
+      "retrievedAt": 1793475577878,
       "readBy": [
-        "investigator",
         "prosecutor",
+        "investigator",
         "defender"
       ],
+      "image": {
+        "url": "https://odihr.osce.org/sites/default/files/styles/container_lg_1x/public/2026-10/DSC03330.JPG?itok=bAYPZbWf",
+        "credit": "Image: odihr.osce.org"
+      },
       "length": 7056
+    },
+    {
+      "id": "S2",
+      "url": "https://en.wikipedia.org/wiki/2026_Serbian_parliamentary_election",
+      "title": "2026 Serbian parliamentary election",
+      "publisher": "en.wikipedia.org",
+      "retrievedAt": 1793475607337,
+      "published": "2026-10-31T11:45:32Z",
+      "readBy": [
+        "investigator",
+        "prosecutor"
+      ],
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/2026_Serbian_Election_Map.svg/960px-2026_Serbian_Election_Map.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+        "credit": "Image via Wikipedia / Wikimedia Commons"
+      },
+      "length": 54141
     }
   ],
   "evidence": [
@@ -29,9 +50,9 @@
       "publisher": "odihr.osce.org",
       "quote": "The 25 October early parliamentary elections saw active citizen engagement with high voter turnout and vigorous competition between two main contenders, but unfolded in an atmosphere of profound polarization, with the equality of campaign opportunities seriously compromised.",
       "bearing": "supports",
-      "relevance": "Confirms the claim's reference to high voter turnout and vigorous competition, directly from international observers' preliminary findings.",
-      "citedBy": "investigator",
-      "at": 1793471796159,
+      "relevance": "Directly confirms voter turnout and vigorous competition were noted by observers, but reveals these positives occurred alongside serious democratic deficits.",
+      "citedBy": "prosecutor",
+      "at": 1793475588103,
       "round": 1
     },
     {
@@ -42,9 +63,9 @@
       "publisher": "odihr.osce.org",
       "quote": "The 25 October early parliamentary elections saw active citizen engagement with high voter turnout and vigorous competition between two main contenders",
       "bearing": "supports",
-      "relevance": "Directly confirms the claim's core assertion that observers praised high voter turnout and vigorous competition.",
-      "citedBy": "defender",
-      "at": 1793471797903,
+      "relevance": "Directly confirms the claim's praise for high voter turnout and vigorous competition.",
+      "citedBy": "investigator",
+      "at": 1793475588167,
       "round": 1
     },
     {
@@ -55,9 +76,9 @@
       "publisher": "odihr.osce.org",
       "quote": "Election day saw high voter engagement and the International Election Observation Mission (IEOM) positively assessed all stages of the election day process in the vast majority of polling stations observed.",
       "bearing": "supports",
-      "relevance": "Shows observers gave a positive assessment of election day, supporting the claim's assertion of positive assessment.",
-      "citedBy": "prosecutor",
-      "at": 1793471798035,
+      "relevance": "Shows international observers gave a positive assessment of the election day process itself.",
+      "citedBy": "investigator",
+      "at": 1793475589638,
       "round": 1
     },
     {
@@ -66,11 +87,11 @@
       "url": "https://odihr.osce.org/node/666908",
       "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
       "publisher": "odihr.osce.org",
-      "quote": "Entrenched advantages enjoyed by the ruling party, including misuse of state resources, together with intimidation and pressure on voters, candidates, and civil society, as well as disruptions of campaign activities, further marred the electoral environment.",
+      "quote": "Election day saw high voter engagement and the International Election Observation Mission (IEOM) positively assessed all stages of the election day process in the vast majority of polling stations observed. Nevertheless, reported incidents of physical violence raised serious concerns and some procedural shortcomings were noted.",
       "bearing": "undermines",
-      "relevance": "Contradicts the implication of overall positive assessment by documenting serious violations including misuse of state resources, intimidation, and pressure.",
-      "citedBy": "investigator",
-      "at": 1793471798258,
+      "relevance": "The preliminary assessment limited positive assessment to election day implementation only, while flagging violence and procedural problems—not an unqualified \"positive assessment.\"",
+      "citedBy": "prosecutor",
+      "at": 1793475590318,
       "round": 1
     },
     {
@@ -79,11 +100,11 @@
       "url": "https://odihr.osce.org/node/666908",
       "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
       "publisher": "odihr.osce.org",
-      "quote": "Entrenched advantages enjoyed by the ruling party, including misuse of state resources, together with intimidation and pressure on voters, candidates, and civil society, as well as disruptions of campaign activities, further marred the electoral environment... A pronounced bias in monitored media coverage in favour of the incumbent party, coupled with an online environment marked by inflammatory rhetoric and information manipulation, hampered voters' ability to obtain impartial and reliable information.",
-      "bearing": "context",
-      "relevance": "Provides critical context showing that while observers praised specific aspects, they identified profound concerns including state resource misuse, intimidation, media bias, and information manipulation.",
-      "citedBy": "prosecutor",
-      "at": 1793471799934,
+      "quote": "but unfolded in an atmosphere of profound polarization, with the equality of campaign opportunities seriously compromised. Entrenched advantages enjoyed by the ruling party, including misuse of state resources, together with intimidation and pressure on voters, candidates, and civil society, as well as disruptions of campaign activities, further marred the electoral environment.",
+      "bearing": "undermines",
+      "relevance": "The claim characterizes the assessment as \"positive\" overall, but observers documented severe systemic problems: polarization, unequal campaign opportunities, state resource misuse, voter intimidation, and disrupted campaigns.",
+      "citedBy": "investigator",
+      "at": 1793475591512,
       "round": 1
     },
     {
@@ -92,11 +113,11 @@
       "url": "https://odihr.osce.org/node/666908",
       "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
       "publisher": "odihr.osce.org",
-      "quote": "A pronounced bias in monitored media coverage in favour of the incumbent party, coupled with an online environment marked by inflammatory rhetoric and information manipulation, hampered voters' ability to obtain impartial and reliable information.",
+      "quote": "Entrenched advantages enjoyed by the ruling party, including misuse of state resources, together with intimidation and pressure on voters, candidates, and civil society, as well as disruptions of campaign activities, further marred the electoral environment.",
       "bearing": "undermines",
-      "relevance": "Documents systematic bias and manipulation that undermined democratic conditions, adding to the assessment's negative dimensions beyond what a \"positive assessment\" claim suggests.",
-      "citedBy": "investigator",
-      "at": 1793471800352,
+      "relevance": "Observers documented systematic abuses that contradicted an unqualified \"positive assessment\" of the overall electoral process.",
+      "citedBy": "prosecutor",
+      "at": 1793475592655,
       "round": 1
     },
     {
@@ -105,823 +126,1279 @@
       "url": "https://odihr.osce.org/node/666908",
       "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
       "publisher": "odihr.osce.org",
-      "quote": "Nevertheless, reported incidents of physical violence raised serious concerns and some procedural shortcomings were noted.",
-      "bearing": "context",
-      "relevance": "Additional context showing serious concerns about physical violence and procedural issues that qualify the overall assessment.",
-      "citedBy": "prosecutor",
-      "at": 1793471801482,
-      "round": 1
-    },
-    {
-      "id": "E8",
-      "sourceId": "S1",
-      "url": "https://odihr.osce.org/node/666908",
-      "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
-      "publisher": "odihr.osce.org",
-      "quote": "but unfolded in an atmosphere of profound polarization, with the equality of campaign opportunities seriously compromised. Entrenched advantages enjoyed by the ruling party, including misuse of state resources, together with intimidation and pressure on voters, candidates, and civil society, as well as disruptions of campaign activities, further marred the electoral environment.",
+      "quote": "A pronounced bias in monitored media coverage in favour of the incumbent party, coupled with an online environment marked by inflammatory rhetoric and information manipulation, hampered voters' ability to obtain impartial and reliable information.",
       "bearing": "undermines",
-      "relevance": "Shows the full assessment was significantly critical, not simply positive—observers cited serious concerns about polarization, compromised equality, state resource misuse, and voter intimidation.",
+      "relevance": "Documents serious concerns about biased media and information manipulation that undermined the electoral environment and voter information access.",
       "citedBy": "defender",
-      "at": 1793471802208,
-      "round": 1
-    },
-    {
-      "id": "E9",
-      "sourceId": "S1",
-      "url": "https://odihr.osce.org/node/666908",
-      "title": "Serbia, Early Parliamentary Elections, 25 October 2026",
-      "publisher": "odihr.osce.org",
-      "quote": "Election day saw high voter engagement and the International Election Observation Mission (IEOM) positively assessed all stages of the election day process in the vast majority of polling stations observed. Nevertheless, reported incidents of physical violence raised serious concerns and some procedural shortcomings were noted.",
-      "bearing": "context",
-      "relevance": "Shows observers gave qualified assessments of election day itself but tempered positive remarks with serious concerns about violence and procedural issues.",
-      "citedBy": "investigator",
-      "at": 1793471802813,
+      "at": 1793475596326,
       "round": 1
     }
   ],
   "filings": [
     {
+      "role": "investigator",
+      "round": 1,
+      "stance": "misleading",
+      "confidence": 72,
+      "argument": "The claim selectively emphasizes what observers praised—high turnout and vigorous competition—but omits critical context. The same preliminary findings report documents that observers assessed the election as unfolding \"in an atmosphere of profound polarization\" with \"equality of campaign opportunities seriously compromised,\" state resource misuse, voter intimidation, and campaign disruptions (E5). While observers did positively assess the election day process itself (E3), the overall assessment was decidedly mixed.",
+      "evidenceIds": [
+        "E2",
+        "E3",
+        "E5"
+      ],
+      "changed": false,
+      "at": 1793475595801
+    },
+    {
       "role": "prosecutor",
       "round": 1,
       "stance": "misleading",
-      "confidence": 78,
-      "argument": "The claim selectively presents positive assessment of voter turnout and vigorous competition (E1, E3), which observers did praise. However, it omits critical context: observers documented \"profound polarization,\" \"seriously compromised\" equality of opportunities, ruling party advantages, state resource misuse, intimidation, media bias, information manipulation (E5), and physical violence incidents (E7). The assessment was mixed and heavily qualified, not simply \"positive.\"",
+      "confidence": 72,
+      "argument": "The claim selects only the positive aspects observers praised—high turnout and vigorous competition—while omitting critical findings that framed the election's overall context. Observers did acknowledge these positives (E1), but explicitly documented \"profound polarization,\" \"misuse of state resources,\" \"intimidation,\" \"violence,\" and media bias (E4, E6). The preliminary assessment was decidedly mixed, not unqualifiedly \"positive.\" The claim's framing misrepresents the balanced, critical tenor of observers' judgment.",
+      "evidenceIds": [
+        "E1",
+        "E4",
+        "E6"
+      ],
+      "changed": false,
+      "at": 1793475598088
+    },
+    {
+      "role": "defender",
+      "round": 1,
+      "stance": "misleading",
+      "confidence": 72,
+      "argument": "The claim selectively emphasizes elements observers praised—high voter turnout and vigorous competition (E1, E3)—but omits critical findings. The assessment identifies serious systemic problems: \"profound polarization,\" misuse of state resources, intimidation of voters and candidates, media bias favoring the incumbent, and information manipulation (E6, E7). Observers' evaluation was nuanced and conditional, not unambiguously positive. The framing misleads by highlighting praised aspects while suppressing major reservations about electoral integrity and fairness.",
       "evidenceIds": [
         "E1",
         "E3",
-        "E5",
+        "E6",
         "E7"
       ],
       "changed": false,
-      "at": 1793471804025
-    },
-    {
-      "role": "defender",
-      "round": 1,
-      "stance": "misleading",
-      "confidence": 82,
-      "argument": "The claim selectively praises elements observers did identify—high voter turnout and vigorous competition (E2), and positive assessment of election day processes (E3). However, it omits that the comprehensive assessment was far more critical. Observers documented profound polarization, seriously compromised campaign equality, state resource misuse, voter intimidation, media bias, and information manipulation (E8). The claim's framing as simply \"positive\" misleads readers by presenting only favorable findings while excluding substantial documented concerns.",
-      "evidenceIds": [
-        "E2",
-        "E3",
-        "E8"
-      ],
-      "changed": false,
-      "at": 1793471805093
-    },
-    {
-      "role": "investigator",
-      "round": 1,
-      "stance": "misleading",
-      "confidence": 82,
-      "argument": "The claim accurately reflects two specific findings—high voter turnout and vigorous competition (E1). However, it misrepresents the overall international assessment as \"positive\" by omitting severe systemic violations. Observers documented profound polarization, ruling-party misuse of state resources, voter intimidation, media bias, and inflammatory information manipulation (E4, E6). While election day itself received qualified praise (E9), the overall preliminary assessment was mixed-to-critical, not uniformly positive.",
-      "evidenceIds": [
-        "E1",
-        "E4",
-        "E6",
-        "E9"
-      ],
-      "changed": false,
-      "at": 1793471805837
-    },
-    {
-      "role": "defender",
-      "round": 2,
-      "stance": "misleading",
-      "confidence": 82,
-      "argument": "All three advocates correctly identify the claim as misleading. The observers did praise high voter turnout and vigorous competition (E2), and gave qualified positive assessment of election day processes (E3). However, the overall preliminary assessment documented profound polarization, compromised campaign equality, state resource misuse, voter intimidation, media bias, and information manipulation (E8). Calling this simply \"positive\" omits substantial critical findings and misleads readers about the assessment's overall character.",
-      "evidenceIds": [
-        "E2",
-        "E3",
-        "E8"
-      ],
-      "changed": false,
-      "whatChanged": "No stance change. Challenge highlights internal inconsistency in prosecutor's framing rather than establishing new facts about the claim itself.",
-      "at": 1793471816805
+      "at": 1793475601401
     },
     {
       "role": "prosecutor",
-      "round": 2,
+      "round": 3,
       "stance": "misleading",
-      "confidence": 78,
-      "argument": "The claim is supported on narrow points—observers did praise turnout, competition, and election day processes (E1, E2, E3). However, it severely omits that the comprehensive assessment documented profound polarization, compromised campaign equality, state resource misuse, voter intimidation, media bias, and violence (E4, E5, E6, E8). The claim's framing as simply \"positive\" misleads by selecting favorable findings while excluding substantial systemic violations that formed the bulk of observers' concerns.",
+      "confidence": 75,
+      "argument": "The claim mischaracterizes observers' assessment by framing it as unqualifiedly \"positive\" when the preliminary findings explicitly mixed praise for specific elements (turnout, competition, election day operations) with systematic criticisms of the overall electoral environment. ODIHR documented \"profound polarization,\" state resource misuse, voter intimidation, campaign disruptions, media bias, and violence (E1, E5, E6, E7). The word \"positive\" in the preliminary findings applies narrowly to election day processes (E3), not the overall assessment. The claim selects praise while suppressing documented deficits.",
       "evidenceIds": [
         "E1",
-        "E2",
+        "E3",
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "changed": false,
+      "whatChanged": "Lead L2 confirmed the final ODIHR report is unavailable, so the preliminary findings remain the only authoritative source. This solidifies that the \"positive assessment\" claim rests entirely on selective framing of a mixed preliminary evaluation.",
+      "at": 1793475627925
+    },
+    {
+      "role": "investigator",
+      "round": 3,
+      "stance": "contradicted",
+      "confidence": 78,
+      "argument": "The claim states observers \"gave Serbia's 25 October 2026 election a positive assessment.\" The evidence shows observers used \"positively assessed\" only for the election day process itself (E3, E4)—not the overall election. The broader findings document \"profound polarization,\" compromised campaign equality, state resource misuse, voter intimidation, media bias, and violence (E1, E5, E6, E7). The preliminary assessment's overall tenor was decidedly critical, not positive. L1 and L2 confirm no final report contradicting this was publicly available.",
+      "evidenceIds": [
+        "E1",
         "E3",
         "E4",
         "E5",
         "E6",
-        "E8"
+        "E7"
       ],
-      "changed": false,
-      "whatChanged": "No change. Cross-examination confirmed the narrow textual accuracy of positive language while reinforcing that selective omission of critical findings constitutes misleading framing.",
-      "at": 1793471818515
+      "changed": true,
+      "whatChanged": "Initial analysis treated \"positive assessment\" as a framing issue (selective emphasis). Re-reading the evidence reveals it is a factual error: observers only positively assessed the election day process, not the election itself. The preliminary findings overall assessment was mixed-to-negative on systemic electoral conditions, making the claim factually inaccurate as stated.",
+      "at": 1793475630314
     },
     {
-      "role": "investigator",
-      "round": 2,
+      "role": "defender",
+      "round": 3,
       "stance": "misleading",
-      "confidence": 82,
-      "argument": "The claim accurately cites specific praised elements—high voter turnout and vigorous competition (E1, E2)—which observers did document. However, \"a positive assessment\" mischaracterizes the overall preliminary findings. Observers immediately followed praise for turnout/competition with severe systemic critiques: profound polarization, seriously compromised campaign equality, state resource misuse, voter intimidation, media bias, and information manipulation (E5, E8). While election day received qualified positive assessment (E3, E9), readers would interpret \"Serbia's election\" as the overall process, not narrowly day-of procedures. The assessment was mixed-to-critical overall, not simply positive.",
+      "confidence": 72,
+      "argument": "The claim conflates limited positive assessments of election day operations with an overall \"positive assessment.\" Observers explicitly used \"positively assessed\" only for election day implementation (E3, E4), immediately qualified by concerns about violence and procedural shortcomings. The overall assessment framed the election with \"profound polarization,\" systemic resource misuse, intimidation, and media bias (E1, E5, E6, E7). The claim misleads by elevating a partial, conditional assessment into an unqualified positive judgment of the entire electoral process.",
       "evidenceIds": [
         "E1",
-        "E2",
         "E3",
+        "E4",
         "E5",
-        "E8",
-        "E9"
+        "E6",
+        "E7"
       ],
       "changed": false,
-      "at": 1793471840202
+      "at": 1793475631977
     }
   ],
   "challenges": [
     {
-      "id": "774dae87-1de0-49cc-ae4b-9f6b49f16196",
-      "from": "prosecutor",
-      "to": "defender",
-      "kind": "framing",
-      "point": "The defender characterizes the claim's \"positive assessment\" framing as misleading, but the source itself (E3) explicitly states observers \"positively assessed\" election day processes. The claim's use of \"positive assessment\" is textually supported—the issue is not whether observers used positive language, but whether selecting only positive elements while omitting critical ones constitutes misleading framing, which the defender acknowledges but frames differently than necessary.",
-      "evidenceIds": [
-        "E3"
-      ],
-      "at": 1793471809651
-    },
-    {
-      "id": "2cbc5155-d7ca-4a99-8f1f-e2f33807e105",
-      "from": "prosecutor",
-      "to": "investigator",
-      "kind": "framing",
-      "point": "The investigator claims the assessment was \"mixed-to-critical\" overall, but E9 shows that even alongside serious concerns about violence, observers still used the language \"positively assessed\" for election day processes. This doesn't support calling the assessment primarily \"critical\"—it was genuinely mixed: observers praised specific operational aspects while criticizing systemic factors. The characterization slightly overstates the negativity.",
-      "evidenceIds": [
-        "E9"
-      ],
-      "at": 1793471811890
-    },
-    {
-      "id": "52faee3c-0580-42d9-a90e-7b5c7de6af7d",
-      "from": "investigator",
-      "to": "prosecutor",
-      "kind": "framing",
-      "point": "Your filing does not distinguish between observers' \"positive assessment\" of election-day procedures (E3, E9) and their overall assessment of the entire electoral process. The claim's phrasing \"Serbia's 25 October 2026 election\" is ambiguous—it could mean the day itself or the whole process. You treat them as equivalent when they represent different scopes of assessment.",
-      "evidenceIds": [
-        "E3",
-        "E5",
-        "E9"
-      ],
-      "at": 1793471812556
-    },
-    {
-      "id": "9ee8e91c-4fab-4999-bb15-596fe5f35ed3",
+      "id": "C1",
+      "round": 3,
       "from": "defender",
       "to": "prosecutor",
       "kind": "framing",
-      "point": "The prosecutor cites E3 as evidence supporting that observers gave a positive assessment, then argues the claim is misleading for highlighting that same positive assessment. This is self-contradictory: either observers' positive remarks about election day are part of the assessment record (making the claim factually accurate on that point), or they aren't (making E3 not support the claim). The prosecutor cannot simultaneously use E3 to validate the \"positive assessment\" language and then argue citing that language is misleading.",
+      "point": "You and the investigator accept that observers gave a \"positive assessment,\" but the evidence shows observers used \"positively assessed\" only for election day operations (E3, E4), not the overall electoral process. The preliminary findings' opening frames the overall assessment with \"profound polarization\" and compromised equality—not positive language. This distinction matters to the claim's accuracy.",
       "evidenceIds": [
+        "E1",
+        "E3",
+        "E4"
+      ],
+      "at": 1793475623792
+    },
+    {
+      "id": "C2",
+      "round": 3,
+      "from": "prosecutor",
+      "to": "investigator",
+      "kind": "framing",
+      "point": "Your filing treats E2 and E3 as confirming a \"positive assessment\" overall, but E2 is a fragment of a longer sentence (E1) that immediately qualifies it with \"but unfolded in profound polarization,\" and E3 limits positive assessment to \"election day process.\" You haven't established that ODIHR characterized the overall election assessment as \"positive.\"",
+      "evidenceIds": [
+        "E1",
+        "E2",
         "E3"
       ],
-      "at": 1793471813328
+      "at": 1793475624113
+    },
+    {
+      "id": "C3",
+      "round": 3,
+      "from": "investigator",
+      "to": "prosecutor",
+      "kind": "framing",
+      "point": "The filing accepts that observers did give a \"positive assessment\" while omitting negatives, but the evidence shows observers only \"positively assessed\" the election day process itself (E3, E4), not the overall election. The claim's language conflates these distinct judgments.",
+      "evidenceIds": [
+        "E3",
+        "E4"
+      ],
+      "at": 1793475624119
+    },
+    {
+      "id": "C4",
+      "round": 3,
+      "from": "prosecutor",
+      "to": "investigator",
+      "kind": "framing",
+      "point": "Your evidence E3 documents a positive assessment of \"election day process\" only, not the overall election. By citing it first to show observers praised aspects, you risk implying observers gave a positive overall assessment—the exact claim being tested. The preliminary findings frame the election overall in negative opening language, not positive terms.",
+      "evidenceIds": [
+        "E3",
+        "E1"
+      ],
+      "at": 1793475625437
     }
   ],
   "verdicts": [
     {
-      "round": 2,
-      "verdict": "misleading",
+      "round": 4,
+      "verdict": "contradicted",
       "confidence": 82,
-      "headline": "Claim isolates praise, omits election observers' systemic concerns",
-      "summary": "International observers did praise Serbia's voter turnout and competition, and positively assessed election-day procedures. However, their preliminary assessment immediately documented profound polarization, compromised campaign equality, state resource misuse, voter intimidation, media bias, and physical violence—making the overall assessment mixed-to-critical, not simply positive. The claim selects favorable findings while omitting substantial systemic violations.",
-      "reasoning": "E1 and E2 confirm observers praised \"high voter turnout and vigorous competition.\" E3 confirms positive assessment of election-day processes. However, E1 and E8 show these positives were followed by severe critiques: \"profound polarization,\" \"seriously compromised\" equality, state resource misuse, voter intimidation. E5 and E6 document media bias and information manipulation. E7 and E9 cite concerns about physical violence. The claim's framing as simply \"positive\" selects favorable elements while omitting the substantial critical findings that defined the observers' overall preliminary assessment, misleading readers about its character.",
+      "headline": "Observers praised turnout but gave mixed assessment, not positive",
+      "summary": "International observers documented high voter turnout and vigorous competition, but framed the overall election within \"profound polarization\" and systematic abuses: state resource misuse, voter intimidation, and media bias. Observers \"positively assessed\" only the election day process itself, not the election overall. The claim conflates partial praise with an overall positive judgment that the evidence does not support.",
+      "reasoning": "E1 confirms observers noted high turnout and vigorous competition but immediately qualified this: \"but unfolded in an atmosphere of profound polarization, with the equality of campaign opportunities seriously compromised.\" E3 and E4 show \"positively assessed\" applies only to \"election day process,\" not the overall assessment. E5, E6, and E7 document the overall framing: systematic polarization, state resource misuse, voter intimidation, campaign disruptions, media bias, and violence. All advocates eventually conceded (C1-C4) that observers used positive language only for discrete procedures, not the overall election. The claim's assertion of an overall \"positive assessment\" contradicts the evidence.",
       "uncertainties": [
-        "Whether readers would interpret 'Serbia's election' as the election-day process specifically versus the entire electoral process; the claim's scope is ambiguous"
+        "Whether a final ODIHR report issued months later might have revised or reframed the preliminary assessment (L1, L2 remain unresolved—no final report located)",
+        "The precise intended meaning of 'positive assessment' in the original claim (overall tenor vs. discrete elements)"
       ],
       "framingNotes": [
-        "Selective quotation: the claim isolates observers' praise for turnout and competition without the immediately following documentation of profound polarization and systemic violations",
-        "Omitted context: observers' positive remarks about operational aspects were heavily qualified by extensive systemic critiques that formed the substantive portion of their preliminary assessment",
-        "Loaded framing: characterizing the overall assessment as 'positive' inverts the actual balance, which documented more systemic concern than praise"
+        "The claim selects the specific elements observers praised (high turnout, vigorous competition) while omitting the critical overall frame: 'profound polarization,' 'seriously compromised' campaign equality, state resource misuse, intimidation, and media bias documented in the same source",
+        "The claim uses 'gave...a positive assessment' (singular overall judgment) when the evidence shows observers applied positive language narrowly to one day's procedural execution, immediately qualified by documented violence and shortcomings",
+        "E2, cited in isolation by some advocates, is excerpted from E1's longer sentence that negates its implication—using fragmentary quotation without the qualifying 'but' misrepresents the judgment"
       ],
-      "at": 1793471852296,
+      "at": 1793475653310,
       "keyEvidenceIds": [
         "E1",
-        "E2",
         "E3",
+        "E4",
         "E5",
-        "E8"
+        "E6",
+        "E7"
       ]
     }
   ],
   "objections": [],
   "activity": [
     {
-      "id": "48eefddf-4754-42b5-ba6c-e2fb3274705e",
+      "id": "b4691c69-26ba-46ae-939d-56d51b9d2cc5",
       "role": "clerk",
       "kind": "phase",
       "text": "Case opened.",
-      "at": 1793471783615
+      "at": 1793475576804
     },
     {
-      "id": "f31efac2-5ff4-441b-b565-8fdb6269a1fa",
+      "id": "89133785-623b-48ad-882d-fa3d3b101981",
       "role": "clerk",
       "kind": "tool",
       "text": "Exhibit S1 entered: Serbia, Early Parliamentary Elections, 25 October 2026",
-      "at": 1793471784720
+      "at": 1793475577878
     },
     {
-      "id": "d6ee5b6d-3704-4aed-9856-1e1fcd8460bf",
+      "id": "977bc718-efac-4ca7-9eba-67f9955104d3",
       "role": "clerk",
       "kind": "phase",
-      "text": "Three advocates begin investigating at once.",
-      "at": 1793471784721
+      "text": "Three reporters begin investigating at once.",
+      "at": 1793475577880
     },
     {
-      "id": "c8ca9279-98ba-4d32-8091-983edd23f555",
+      "id": "31bdde86-1c97-489a-9ea5-c1edebe58cc3",
       "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471784724
+      "at": 1793475577883
     },
     {
-      "id": "599c4b48-01f2-4fde-88dc-19232b41edc5",
+      "id": "523d31a3-34a8-413d-b7ab-d379e679c19f",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471784725
+      "at": 1793475577884
     },
     {
-      "id": "8c658c75-b018-4a84-8c58-9dafe85c1174",
+      "id": "5d64d784-3342-496a-b0a0-db91afa001e7",
       "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471784725
+      "at": 1793475577884
     },
     {
-      "id": "2080028c-2902-4050-9b9e-727b26d143eb",
-      "role": "prosecutor",
-      "kind": "tool",
-      "text": "Searching: \"Serbia 25 October 2026 election OSCE observers assessment\"",
-      "at": 1793471786353
-    },
-    {
-      "id": "80ec4698-667a-4209-9082-df92a3a28d1a",
+      "id": "6284929f-66df-4603-9c1f-3558bebcd229",
       "role": "defender",
-      "kind": "tool",
-      "text": "Searching: \"Serbia October 25 2026 election OSCE preliminary findings assessment\"",
-      "at": 1793471786751
-    },
-    {
-      "id": "5255cf54-108d-4441-9325-07fc8b2bb50f",
-      "role": "investigator",
       "kind": "tool",
       "text": "Searching: \"Serbia 25 October 2026 election international observers assessment\"",
-      "at": 1793471786765
+      "at": 1793475579844
     },
     {
-      "id": "1765f017-47ac-483b-bc3d-9ce81985d8f4",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471787960
-    },
-    {
-      "id": "dae1793b-8863-4f3b-be50-b49d6c4d584e",
-      "role": "defender",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471788819
-    },
-    {
-      "id": "655bbd08-5439-4874-a5c4-79f7170cfa86",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471789171
-    },
-    {
-      "id": "4fa2851c-b6fd-49cd-a3ed-43a5fbc2f4c1",
-      "role": "prosecutor",
-      "kind": "tool",
-      "text": "Searching: \"OSCE preliminary findings Serbia election October 2026 voter turnout\"",
-      "at": 1793471789344
-    },
-    {
-      "id": "54528c5f-ff1a-4298-a082-7806ff768ba8",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471790091
-    },
-    {
-      "id": "9bd0e673-a45d-457e-ac6d-c9f5249a702e",
-      "role": "defender",
-      "kind": "tool",
-      "text": "Searching: \"OSCE ODIHR Serbia 2026 preliminary findings voter turnout competition\"",
-      "at": 1793471790715
-    },
-    {
-      "id": "d7c6ce57-7455-44b3-812f-4da02b31858a",
+      "id": "e3e771cf-9cb2-4ef2-a3e2-33fabb9b1af1",
       "role": "investigator",
       "kind": "tool",
-      "text": "Reading odihr.osce.org/node/666908",
-      "at": 1793471790798
+      "text": "Searching: \"OSCE ODIHR Serbia October 2026 election observation findings assessment\"",
+      "at": 1793475579947
     },
     {
-      "id": "9580bbab-0b8d-418e-ad55-f9d2ba7f7cdf",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471790799
-    },
-    {
-      "id": "078c262c-64e2-42f5-b0f0-8ea9636f7172",
-      "role": "defender",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471791458
-    },
-    {
-      "id": "f878d6e9-cc26-4315-bb80-b5c2d2d6a43e",
+      "id": "81aa0cab-8400-4e82-9f65-41d31b927bbe",
       "role": "prosecutor",
       "kind": "tool",
       "text": "Reading odihr.osce.org/node/666908",
-      "at": 1793471791721
+      "at": 1793475580194
     },
     {
-      "id": "84c27742-272f-4a58-8ded-dada7baa9145",
+      "id": "37375b2f-b108-469a-ac6a-dea60b044cca",
       "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471791721
+      "at": 1793475580195
     },
     {
-      "id": "8fef83a8-97e8-45c8-9256-31a25e8c4471",
-      "role": "defender",
-      "kind": "tool",
-      "text": "Reading odihr.osce.org/node/666908",
-      "at": 1793471793130
+      "id": "1a563e90-0c71-4e40-b563-6ec58e2f9590",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475581011
     },
     {
-      "id": "df3832fb-072e-4f53-9897-029b34fa75ae",
+      "id": "6d30293e-77e0-4361-852f-e92020c9d2c6",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471793130
+      "at": 1793475581118
     },
     {
-      "id": "fc245f98-b62f-47fb-be0e-0511d5b8be98",
+      "id": "51b89c89-0331-4702-ba99-576cd4c157d8",
+      "role": "defender",
+      "kind": "tool",
+      "text": "Searching: \"OSCE ODIHR Serbia 2026 election preliminary findings assessment\"",
+      "at": 1793475582382
+    },
+    {
+      "id": "c0894055-7365-4f19-8986-c10cce24160f",
       "role": "investigator",
+      "kind": "tool",
+      "text": "Reading odihr.osce.org/node/666908",
+      "at": 1793475582696
+    },
+    {
+      "id": "5e6fdc8a-0ce6-40cc-a09c-8e99a13a5c79",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475582696
+    },
+    {
+      "id": "3d29082b-5c75-4dc2-9ef7-8d8ef9803055",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475583011
+    },
+    {
+      "id": "76556784-92ab-424c-82b0-7f576e8c45c9",
+      "role": "defender",
+      "kind": "tool",
+      "text": "Reading odihr.osce.org/node/666908",
+      "at": 1793475584620
+    },
+    {
+      "id": "631495ec-82ad-4e28-b8cd-391be43d8c08",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475584621
+    },
+    {
+      "id": "037eb2d3-39d7-482d-8095-992f16284840",
+      "role": "prosecutor",
       "kind": "tool",
       "text": "Entered E1 into evidence (supports)",
-      "at": 1793471796159
+      "at": 1793475588103
     },
     {
-      "id": "7ea6ce2a-7fba-4998-b42b-da2298044277",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471796159
-    },
-    {
-      "id": "8625a2e6-14f7-4796-b349-70a219e8e941",
+      "id": "a8ccd496-4862-495f-9d53-f66364b61e56",
       "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471796426
+      "at": 1793475588103
     },
     {
-      "id": "fb7f8151-d534-4067-96f1-5e0126db4238",
-      "role": "defender",
+      "id": "1198ae78-2394-4585-a253-fde31dc255fa",
+      "role": "investigator",
       "kind": "tool",
       "text": "Entered E2 into evidence (supports)",
-      "at": 1793471797903
+      "at": 1793475588167
     },
     {
-      "id": "0178f092-72c0-44a9-b140-86b20f17cc7a",
-      "role": "defender",
+      "id": "2bf78609-7463-45f1-b459-71f94d280628",
+      "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471797903
+      "at": 1793475588167
     },
     {
-      "id": "d9b6e5ff-ced0-419e-af17-c104079d8c24",
-      "role": "prosecutor",
+      "id": "fdb6b3e0-e151-4a66-be8f-97048a7b7764",
+      "role": "investigator",
       "kind": "tool",
       "text": "Entered E3 into evidence (supports)",
-      "at": 1793471798035
+      "at": 1793475589638
     },
     {
-      "id": "3d141cb3-4fd4-4be6-8c05-16f6989e27b1",
-      "role": "prosecutor",
+      "id": "dd2310ea-10f1-4d24-97d4-8917e5dd0289",
+      "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471798035
+      "at": 1793475589638
     },
     {
-      "id": "4749dff0-ca3f-4b20-add5-c7a303745323",
-      "role": "investigator",
+      "id": "a540c4e8-552c-41bd-b7cc-6062ed4afd8b",
+      "role": "prosecutor",
       "kind": "tool",
       "text": "Entered E4 into evidence (undermines)",
-      "at": 1793471798258
+      "at": 1793475590318
     },
     {
-      "id": "3cdeb886-88c7-4cc7-b568-e4c292986372",
-      "role": "investigator",
+      "id": "bc8d87b5-79d5-4074-8a56-9e5dd339118f",
+      "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471798258
+      "at": 1793475590318
     },
     {
-      "id": "5184ec49-a38f-4d29-afda-4290088e8c5e",
+      "id": "ed8aad88-f8e0-4bac-ad3b-814bce784be7",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471799846
+      "at": 1793475591292
     },
     {
-      "id": "bd7447d4-0a95-4a81-bb00-9ee11e9bfd54",
-      "role": "prosecutor",
+      "id": "9b80e3cd-97a3-4e58-89db-ef4cbff5dd69",
+      "role": "investigator",
       "kind": "tool",
-      "text": "Entered E5 into evidence (context)",
-      "at": 1793471799934
+      "text": "Entered E5 into evidence (undermines)",
+      "at": 1793475591512
     },
     {
-      "id": "c820a722-3867-4ef7-8170-fa955ac5d632",
-      "role": "prosecutor",
+      "id": "3a769c3c-f1ef-4e2b-89bb-f79eeec95336",
+      "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471799934
+      "at": 1793475591512
     },
     {
-      "id": "2c6913da-c631-4af2-9a05-6536a915aaec",
-      "role": "investigator",
+      "id": "5d79553c-a2c6-4363-b1f1-243091e283f1",
+      "role": "prosecutor",
       "kind": "tool",
       "text": "Entered E6 into evidence (undermines)",
-      "at": 1793471800352
+      "at": 1793475592655
     },
     {
-      "id": "6e785f4c-dbc7-4afe-9829-c419f0eab34b",
+      "id": "ec07f6bf-a798-4c6a-8926-4c8333ca901e",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475592655
+    },
+    {
+      "id": "95034fd8-7fd5-44fd-944d-145f0249aa28",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475592716
+    },
+    {
+      "id": "633aa07a-7e2b-4b66-9a71-79d29982b808",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Raised lead L1: What did the final report (issued \"months after\" the preliminary findings) conclude about the overall assessment of the election?",
+      "at": 1793475593248
+    },
+    {
+      "id": "8dbcfc3f-1e31-46b6-849e-5211063d7515",
       "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471800352
+      "at": 1793475593248
     },
     {
-      "id": "6a3e5764-c8b5-4d6a-b653-db4b35d20d9d",
+      "id": "1e77d66b-6846-4b7c-b919-00df4515e345",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475594444
+    },
+    {
+      "id": "f3bf79cb-81ef-42fe-8b68-16766a37b3d2",
       "role": "prosecutor",
-      "kind": "tool",
-      "text": "Entered E7 into evidence (context)",
-      "at": 1793471801482
+      "kind": "said",
+      "text": "Raised lead L2: What was the final assessment of Serbia's 25 October 2026 election in ODIHR's full report, released \"some months after\"—did it maintain, qualify, or revise the preliminary findings' mixed evaluation?",
+      "at": 1793475594964
     },
     {
-      "id": "b8215fd7-5b13-40ec-b977-1a5ed3c2c3cd",
+      "id": "5faf2dbc-588b-4a33-baea-4bd12d5dc556",
       "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471801482
+      "at": 1793475594964
     },
     {
-      "id": "16e8a7b9-dd0d-435a-8eb1-413a67ea24bd",
+      "id": "dda2f293-34b7-451b-9efe-61dd0fcf427b",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Files: MISLEADING (72%)",
+      "at": 1793475595801
+    },
+    {
+      "id": "f00baa1f-1815-4523-b7c6-f358f06af50f",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475595802
+    },
+    {
+      "id": "9df41bff-2642-4d41-8ba9-f998540c86e7",
       "role": "defender",
       "kind": "tool",
-      "text": "Entered E8 into evidence (undermines)",
-      "at": 1793471802208
+      "text": "Entered E7 into evidence (undermines)",
+      "at": 1793475596326
     },
     {
-      "id": "43f85eda-cef5-4b70-bc5d-58a6d8240e2a",
+      "id": "0f49ec28-359d-458a-9edd-72a29191a52c",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471802208
+      "at": 1793475596326
     },
     {
-      "id": "a694983e-00d8-4f6d-8a20-7fd98bd578c2",
+      "id": "35ab5b93-f2db-4629-9ee5-bcc9681f29fa",
       "role": "investigator",
-      "kind": "tool",
-      "text": "Entered E9 into evidence (context)",
-      "at": 1793471802813
+      "kind": "said",
+      "text": "The claim is **misleading** because it presents a selectively positive framing while omitting the observers' serious criticisms of polarization, unequal campaign conditions, state resource misuse, and voter intimidation.",
+      "at": 1793475596896
     },
     {
-      "id": "d61fa996-4999-4a83-bb6f-504430a500fa",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471802813
-    },
-    {
-      "id": "b3ea7dc2-f1fc-4f65-8979-11e636ffee84",
+      "id": "68d8f042-adfd-482c-9d87-16b923d3634d",
       "role": "prosecutor",
       "kind": "said",
-      "text": "Files: MISLEADING (78%)",
-      "at": 1793471804026
+      "text": "Files: MISLEADING (72%)",
+      "at": 1793475598088
     },
     {
-      "id": "257e4153-f447-4aee-befd-6496a2580f45",
+      "id": "1b12cd67-ec66-4825-87d2-87295c53033b",
       "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471804026
+      "at": 1793475598088
     },
     {
-      "id": "68a75571-97f1-4f58-88ef-00d2ee1e932b",
-      "role": "prosecutor",
-      "kind": "said",
-      "text": "The claim is **misleading**: it cherry-picks praise for turnout and competition while omitting that observers identified profound polarization, compromised equality, state resource misuse, intimidation, media bias, and violence.",
-      "at": 1793471805093
-    },
-    {
-      "id": "16b47728-9cfa-437f-a4d2-ccd244606886",
+      "id": "a3e2bab2-3a2b-4af2-8d18-7ba95a7d0042",
       "role": "defender",
       "kind": "said",
-      "text": "Files: MISLEADING (82%)",
-      "at": 1793471805093
+      "text": "Raised lead L3: What is the exact language and tone of the \"positive assessment\" statement from international observers? Does the preliminary findings document use the word \"positive\" to characterize the overall assessment, or only specific aspects?",
+      "at": 1793475598424
     },
     {
-      "id": "1e162268-20d4-4d88-848c-f786167e01aa",
+      "id": "e6dffeba-7b04-40a6-a279-32227a7746e9",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471805093
+      "at": 1793475598424
     },
     {
-      "id": "cfaff173-ff64-490f-aca0-04d360273b72",
-      "role": "investigator",
+      "id": "f6e070c3-baef-42fc-b33e-14305472b59a",
+      "role": "prosecutor",
       "kind": "said",
-      "text": "Files: MISLEADING (82%)",
-      "at": 1793471805837
+      "text": "**Position filed:** The claim cherry-picks observers' praise for turnout and competition while omitting their documented concerns about polarization, state resource misuse, intimidation, violence, and media bias—rendering it misleading.",
+      "at": 1793475599243
     },
     {
-      "id": "c47afbbe-4ea0-424b-9520-f432e80ff8d0",
+      "id": "0ee670e2-f0be-4112-9573-aa03cca088fd",
+      "role": "defender",
+      "kind": "said",
+      "text": "Files: MISLEADING (72%)",
+      "at": 1793475601401
+    },
+    {
+      "id": "08188267-c000-4b83-b67e-1b2c18c904c2",
       "role": "clerk",
       "kind": "phase",
-      "text": "All positions filed. Cross-examination begins.",
-      "at": 1793471805837
+      "text": "First reports are in. Your call, editor: which leads do we chase?",
+      "at": 1793475601401
     },
     {
-      "id": "1576f3ba-3bc4-4fce-b123-e8ce932558b5",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471805839
-    },
-    {
-      "id": "5830b465-b171-40eb-a2c9-9aaf8a8bfd89",
+      "id": "ad5b5eae-c4bf-48fc-916a-677b9a4acfc8",
       "role": "defender",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471805839
+      "at": 1793475601401
     },
     {
-      "id": "01750456-49c6-4846-aa49-d1a3db761614",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471805839
-    },
-    {
-      "id": "d7dfc079-609c-4834-b77b-598c081d3b5d",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471805839
-    },
-    {
-      "id": "50aaafb4-a015-4965-9638-833c56e38d62",
-      "role": "defender",
-      "kind": "said",
-      "text": "The claim is **misleading**: while international observers did praise high voter turnout and vigorous competition, they issued a nuanced assessment with serious criticisms about polarization, campaign inequality, state resource misuse, voter intimidation, and media bias that the ",
-      "at": 1793471806432
-    },
-    {
-      "id": "6067a3a1-265a-438a-a0b5-b7ce821d5790",
-      "role": "investigator",
-      "kind": "said",
-      "text": "I've filed my position: the claim is MISLEADING at 82% confidence because while it accurately cites specific praised elements (turnout and competition), it omits the observers' substantial documented concerns about polarization, state resource misuse, intimidation, and media bias",
-      "at": 1793471807342
-    },
-    {
-      "id": "312cb6b3-8e1e-4964-b93b-1db7c811479e",
-      "role": "prosecutor",
-      "kind": "said",
-      "text": "Framing objection to the defender: The defender characterizes the claim's \"positive assessment\" framing as misleading, but the source itself (E3) explicitly states observers \"positively assessed\" election day processes. The claim's use of \"positive assessment\" is textually supported—the issue is not whether observers used positive language, but whether selecting only positive elements while omitting critical ones constitutes misleading framing, which the defender acknowledges but frames differently than necessary.",
-      "at": 1793471809651
-    },
-    {
-      "id": "5cb70147-816b-43ba-9a16-9c56dc9c5685",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471809651
-    },
-    {
-      "id": "334938d7-0264-494d-9ae9-07db362126e0",
-      "role": "prosecutor",
-      "kind": "said",
-      "text": "Framing objection to the investigator: The investigator claims the assessment was \"mixed-to-critical\" overall, but E9 shows that even alongside serious concerns about violence, observers still used the language \"positively assessed\" for election day processes. This doesn't support calling the assessment primarily \"critical\"—it was genuinely mixed: observers praised specific operational aspects while criticizing systemic factors. The characterization slightly overstates the negativity.",
-      "at": 1793471811890
-    },
-    {
-      "id": "d2d2fa70-96b0-416f-bdff-bd24a5197b3e",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471811890
-    },
-    {
-      "id": "4b8fa709-2049-439b-8f5d-dd1ef3136071",
-      "role": "investigator",
-      "kind": "said",
-      "text": "Framing objection to the prosecutor: Your filing does not distinguish between observers' \"positive assessment\" of election-day procedures (E3, E9) and their overall assessment of the entire electoral process. The claim's phrasing \"Serbia's 25 October 2026 election\" is ambiguous—it could mean the day itself or the whole process. You treat them as equivalent when they represent different scopes of assessment.",
-      "at": 1793471812556
-    },
-    {
-      "id": "85781747-0e6b-4895-955d-e92a571af694",
-      "role": "investigator",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471812556
-    },
-    {
-      "id": "a9d1ec23-55d7-42f6-9b90-05f377167a72",
-      "role": "defender",
-      "kind": "said",
-      "text": "Framing objection to the prosecutor: The prosecutor cites E3 as evidence supporting that observers gave a positive assessment, then argues the claim is misleading for highlighting that same positive assessment. This is self-contradictory: either observers' positive remarks about election day are part of the assessment record (making the claim factually accurate on that point), or they aren't (making E3 not support the claim). The prosecutor cannot simultaneously use E3 to validate the \"positive assessment\" language and then argue citing that language is misleading.",
-      "at": 1793471813328
-    },
-    {
-      "id": "718b4587-10c9-4b53-959d-9eb41bcbb6ae",
-      "role": "defender",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471813328
-    },
-    {
-      "id": "b6cd2247-701a-449c-b820-83a199745e0d",
-      "role": "defender",
-      "kind": "said",
-      "text": "Files: MISLEADING (82%)",
-      "at": 1793471816805
-    },
-    {
-      "id": "5c8a25e2-7add-4335-bcf0-d1810c535c55",
-      "role": "defender",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471816805
-    },
-    {
-      "id": "616a1ec5-f67b-49a1-8119-11963c1fc10f",
-      "role": "prosecutor",
-      "kind": "said",
-      "text": "Files: MISLEADING (78%)",
-      "at": 1793471818516
-    },
-    {
-      "id": "9877a12c-7492-4846-8eda-d0cfa9e4a144",
-      "role": "prosecutor",
-      "kind": "thinking",
-      "text": "Reasoning…",
-      "at": 1793471818516
-    },
-    {
-      "id": "6366e01b-24d3-4f02-8acc-f9e7f9592f97",
-      "role": "prosecutor",
-      "kind": "said",
-      "text": "Stance unchanged: the claim is **misleading** because it selectively quotes positive elements while omitting the bulk of observers' documented systemic violations and concerns.",
-      "at": 1793471819523
-    },
-    {
-      "id": "21f78b6a-cc18-4eb1-a7d5-1daaf8e33a40",
+      "id": "f3ddde6c-66dc-423e-8fba-e3e7dca3514c",
       "role": "clerk",
-      "kind": "error",
-      "text": "The Investigator went silent. The clerk calls them back to the stand.",
-      "at": 1793471833847
+      "kind": "phase",
+      "text": "Following 2 leads: The Investigator and The Prosecutor.",
+      "at": 1793475602603
     },
     {
-      "id": "60514c0b-2a50-424f-a785-0aff62c352a4",
+      "id": "8e3dcede-9b52-4582-8245-2a53619054a5",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475602604
+    },
+    {
+      "id": "f7b46243-8fda-425c-9f93-40067112964c",
       "role": "investigator",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471833848
+      "at": 1793475602604
     },
     {
-      "id": "5f40b4c8-8c46-44a0-8ee4-111dbaf1b281",
+      "id": "19b5a9d3-c73d-4a2a-bff7-5ba23c7a5788",
+      "role": "defender",
+      "kind": "said",
+      "text": "Position filed: the claim is **misleading** because it selectively highlights praised elements (high turnout, vigorous competition, positive assessment of election day) while omitting the international observers' serious concerns about polarization, state resource misuse, intimid",
+      "at": 1793475602784
+    },
+    {
+      "id": "8889c879-5676-40d5-b959-98bbb8423303",
+      "role": "investigator",
+      "kind": "tool",
+      "text": "Searching: \"ODIHR Serbia October 2026 election final report\"",
+      "at": 1793475604087
+    },
+    {
+      "id": "93142dc7-0acd-408e-afed-4b0bd2fed82e",
+      "role": "prosecutor",
+      "kind": "tool",
+      "text": "Searching: \"ODIHR Serbia 25 October 2026 final report election assessment\"",
+      "at": 1793475604530
+    },
+    {
+      "id": "11453f0e-3b26-42b3-aa8d-976da46d8c1f",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475605326
+    },
+    {
+      "id": "0da8504f-3276-476e-a339-5a336fce02b2",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475605831
+    },
+    {
+      "id": "da51d3a8-09eb-4aab-890c-8cc355451a31",
+      "role": "investigator",
+      "kind": "tool",
+      "text": "Reading en.wikipedia.org/wiki/2026_Serbian_parliamentary_election",
+      "at": 1793475606529
+    },
+    {
+      "id": "fbe5d569-2b8c-4d81-83f1-5f5ed098fc7a",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475607341
+    },
+    {
+      "id": "dff3ae54-93b5-497c-896e-d57900935c54",
+      "role": "prosecutor",
+      "kind": "tool",
+      "text": "Searching: \"ODIHR Serbia election observation mission final report 2026\"",
+      "at": 1793475608152
+    },
+    {
+      "id": "391008f8-4fb4-4523-b68f-a51521bb7628",
+      "role": "investigator",
+      "kind": "tool",
+      "text": "Searching: \"\"ODIHR\" \"Serbia\" \"25 October 2026\" final report observation mission\"",
+      "at": 1793475608406
+    },
+    {
+      "id": "51ff4047-4528-497f-bfbc-98fc26042384",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475608912
+    },
+    {
+      "id": "8697a01b-69de-4f48-a6e9-d66ad1a9b049",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475608914
+    },
+    {
+      "id": "82253a4f-eceb-41a3-9d6b-355d6afa2e79",
+      "role": "investigator",
+      "kind": "tool",
+      "text": "Searching: \"site:odihr.osce.org Serbia 2026 election final report\"",
+      "at": 1793475609958
+    },
+    {
+      "id": "4d4e07ac-b083-412c-905f-d979895f33d2",
+      "role": "prosecutor",
+      "kind": "tool",
+      "text": "Reading en.wikipedia.org/wiki/2026_Serbian_parliamentary_election",
+      "at": 1793475610314
+    },
+    {
+      "id": "735b5e2a-b012-4a17-aa2f-fcd64b619c86",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475610317
+    },
+    {
+      "id": "e6a98f4e-05b5-462a-a9d3-83f855e28c25",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475610624
+    },
+    {
+      "id": "402c3e49-6cd0-410b-913a-96f9bb085a84",
+      "role": "prosecutor",
+      "kind": "tool",
+      "text": "Searching: \"\"Serbia\" \"25 October 2026\" ODIHR \"final report\"\"",
+      "at": 1793475612187
+    },
+    {
+      "id": "f9f7fa5a-da89-4d8d-8887-f4b5225733bd",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475612643
+    },
+    {
+      "id": "733ccf73-6e3d-44c5-93d3-22ec05667efe",
       "role": "investigator",
       "kind": "said",
-      "text": "Files: MISLEADING (82%)",
-      "at": 1793471840202
+      "text": "Reported on L1",
+      "at": 1793475613403
     },
     {
-      "id": "1cc67503-859c-42aa-bb27-604083fa68a7",
+      "id": "e1d095a3-d020-46a5-86fd-c806bfc12469",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475613403
+    },
+    {
+      "id": "a7930aff-293a-42bf-915e-27f1a651a73b",
+      "role": "investigator",
+      "kind": "said",
+      "text": "The final ODIHR report was not located; the preliminary findings from 26 October 2026 remain the only documented observer assessment in available sources.",
+      "at": 1793475614475
+    },
+    {
+      "id": "2829e9be-17a1-4e6f-801c-bf5bdf455398",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Reported on L2",
+      "at": 1793475617827
+    },
+    {
+      "id": "dc134309-f657-4322-a80a-9d1b1fa7f4ff",
+      "role": "clerk",
+      "kind": "phase",
+      "text": "Cross-examination begins.",
+      "at": 1793475617827
+    },
+    {
+      "id": "9821ae8e-108d-4b40-97f3-ad971fda52e1",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475617828
+    },
+    {
+      "id": "42a6ddbc-fe38-4505-b76f-5b61b50ba98a",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475617828
+    },
+    {
+      "id": "8a235f1f-698d-4633-8973-f55d8a69b845",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475617828
+    },
+    {
+      "id": "35a700c3-8c5c-4438-9260-52f81faa6f05",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475617830
+    },
+    {
+      "id": "655f3b0a-f52c-49ca-b1d5-4b922e0c2826",
+      "role": "defender",
+      "kind": "said",
+      "text": "Framing objection to the prosecutor: You and the investigator accept that observers gave a \"positive assessment,\" but the evidence shows observers used \"positively assessed\" only for election day operations (E3, E4), not the overall electoral process. The preliminary findings' opening frames the overall assessment with \"profound polarization\" and compromised equality—not positive language. This distinction matters to the claim's accuracy.",
+      "at": 1793475623792
+    },
+    {
+      "id": "24d1cd97-2ecf-437a-af3d-9078366890bc",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475623792
+    },
+    {
+      "id": "f2fcb7eb-2c59-4f16-9d88-b248c2ccbc8e",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Framing objection to the investigator: Your filing treats E2 and E3 as confirming a \"positive assessment\" overall, but E2 is a fragment of a longer sentence (E1) that immediately qualifies it with \"but unfolded in profound polarization,\" and E3 limits positive assessment to \"election day process.\" You haven't established that ODIHR characterized the overall election assessment as \"positive.\"",
+      "at": 1793475624113
+    },
+    {
+      "id": "610f3db6-77fc-41fd-aef6-cf0362d320d6",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475624113
+    },
+    {
+      "id": "246f78aa-e9df-4c5d-be50-481bb21799dd",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Framing objection to the prosecutor: The filing accepts that observers did give a \"positive assessment\" while omitting negatives, but the evidence shows observers only \"positively assessed\" the election day process itself (E3, E4), not the overall election. The claim's language conflates these distinct judgments.",
+      "at": 1793475624119
+    },
+    {
+      "id": "72b068f6-190a-46c5-b810-3cc8db758f5d",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475624119
+    },
+    {
+      "id": "52ddab96-d354-45a6-ba2e-c177ae827863",
+      "role": "defender",
+      "kind": "tool",
+      "text": "Searching: \"\"positive assessment\" Serbia 2026 election observers OSCE\"",
+      "at": 1793475625179
+    },
+    {
+      "id": "bc9d151b-a212-4b91-8a2e-478375a69bbe",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Framing objection to the investigator: Your evidence E3 documents a positive assessment of \"election day process\" only, not the overall election. By citing it first to show observers praised aspects, you risk implying observers gave a positive overall assessment—the exact claim being tested. The preliminary findings frame the election overall in negative opening language, not positive terms.",
+      "at": 1793475625437
+    },
+    {
+      "id": "a4d01280-1c32-4aec-b780-b2a4bc11a731",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475625437
+    },
+    {
+      "id": "302213e3-47a9-4abc-bab2-06818de2fc90",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475626006
+    },
+    {
+      "id": "0076f98d-35ef-473a-a846-21bb21043805",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Files: MISLEADING (75%)",
+      "at": 1793475627925
+    },
+    {
+      "id": "5609c4ed-035c-4bc1-8a08-8684ba1dc75f",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475627925
+    },
+    {
+      "id": "12fb5632-65bc-457d-b100-a7da4882bc41",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "The final ODIHR report does not appear to exist in public sources, leaving the mixed preliminary findings as the definitive record and confirming the claim's framing as misleading.",
+      "at": 1793475629172
+    },
+    {
+      "id": "78260143-b176-4e83-aa7e-f20d738bc433",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475629880
+    },
+    {
+      "id": "b06affb7-23f5-45a1-96b8-63a286bd4cda",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Files: CONTRADICTED (78%)",
+      "at": 1793475630314
+    },
+    {
+      "id": "232b54cb-c51a-42a1-9336-b04046923c9f",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475630314
+    },
+    {
+      "id": "dfe59591-6b6d-4e50-b25b-3e62b98001c5",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Observers gave a positive assessment only of election day operations, not of the election overall—the broader findings documented severe democratic deficits.",
+      "at": 1793475631478
+    },
+    {
+      "id": "b5c0734f-171f-4f31-b9b9-9004bc900b9f",
+      "role": "defender",
+      "kind": "said",
+      "text": "Files: MISLEADING (72%)",
+      "at": 1793475631977
+    },
+    {
+      "id": "2265a97e-aaf1-4a3a-b500-b7a454508527",
+      "role": "clerk",
+      "kind": "phase",
+      "text": "Rebuttal: The Prosecutor, The Investigator answer the challenges.",
+      "at": 1793475631977
+    },
+    {
+      "id": "58d5601c-83af-41be-9c9a-3d408de3a7f8",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475631978
+    },
+    {
+      "id": "3f7c3086-6e48-4620-ae20-09083b5e5b78",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475631979
+    },
+    {
+      "id": "ca9846c7-f4eb-4e10-be06-3b82453371da",
+      "role": "defender",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475631980
+    },
+    {
+      "id": "6ead6e6d-0338-47f5-a0c5-0c826f7d4ff8",
+      "role": "defender",
+      "kind": "said",
+      "text": "My challenge targets the prosecutorial conflation: observers' \"positive assessment\" applied only to election day operations (E3–E4), not the overall process, which they framed with \"profound polarization\" and systemic abuse (E1, E5–E7).",
+      "at": 1793475633216
+    },
+    {
+      "id": "dea82eea-2c3f-4599-bac1-6d6b95e345bf",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Concedes C2 from the prosecutor",
+      "at": 1793475634113
+    },
+    {
+      "id": "e6fc4f3f-7b7b-4356-ab10-5068a06cee55",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475634113
+    },
+    {
+      "id": "c158c46b-cb10-413e-af39-5de578ee888a",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Concedes C1 from the defender",
+      "at": 1793475635230
+    },
+    {
+      "id": "c8697930-840f-4e22-a175-ac5278080a71",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475635230
+    },
+    {
+      "id": "273f9b43-cc5b-4e1e-8546-2f8238378cb0",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Concedes C4 from the prosecutor",
+      "at": 1793475636172
+    },
+    {
+      "id": "c5f56342-a06f-4257-a2ca-ac7e7d5fc37f",
+      "role": "investigator",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475636173
+    },
+    {
+      "id": "da19e46f-3528-4950-93a6-0080bff4f435",
+      "role": "prosecutor",
+      "kind": "said",
+      "text": "Concedes C3 from the investigator",
+      "at": 1793475637220
+    },
+    {
+      "id": "157e0688-59c3-4edd-9865-21fe2f83e4c3",
+      "role": "clerk",
+      "kind": "phase",
+      "text": "The record is complete. Your call, editor: send it to the judge, or keep reporting?",
+      "at": 1793475637220
+    },
+    {
+      "id": "ed934ea0-9937-44f2-876b-1c534be52b37",
+      "role": "prosecutor",
+      "kind": "thinking",
+      "text": "Reasoning…",
+      "at": 1793475637220
+    },
+    {
+      "id": "561a1002-593a-4c78-96ec-8eea4cf1db41",
+      "role": "investigator",
+      "kind": "said",
+      "text": "Both challenges are sound. E2 isolated misrepresents the full context, and E3 conflates a positive assessment of election day operations with overall positive judgment—exactly what the claim does. My Round 1 filing was vulnerable on precision.",
+      "at": 1793475637443
+    },
+    {
+      "id": "fe5c3a4a-6f3f-4844-984d-be0b4446ef8f",
       "role": "clerk",
       "kind": "phase",
       "text": "The Judge retires to weigh the evidence.",
-      "at": 1793471840202
+      "at": 1793475638421
     },
     {
-      "id": "3bb690e5-1041-4f49-bb7b-05643d87d543",
+      "id": "971203f1-8bd4-4364-9e3e-1ade0f7b8a40",
       "role": "judge",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471840202
+      "at": 1793475638422
     },
     {
-      "id": "fc7d4850-169e-4066-b856-35787d2dec8c",
-      "role": "investigator",
+      "id": "290bfb8e-6747-4f4b-a91d-1dce1f1c2ab6",
+      "role": "prosecutor",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471840203
+      "at": 1793475641141
     },
     {
-      "id": "126467e9-ac5e-47b5-be26-5746c9e4bcd1",
-      "role": "investigator",
+      "id": "a5da74d4-0033-4eda-8ee3-aa2fcb419bcf",
+      "role": "prosecutor",
       "kind": "said",
-      "text": "The investigator's position stands: the claim is MISLEADING (82%) because while specific praised elements are factually accurate, the overall characterization as \"a positive assessment\" omits the observers' substantial systemic criticisms that dominated their preliminary findings",
-      "at": 1793471841628
+      "text": "My position is updated through the rebuttals: the claim is **contradicted**, not merely misleading. Observers only \"positively assessed\" election day procedures, not the overall election, which they framed as marked by \"profound polarization\" and systemic deficits.",
+      "at": 1793475642503
     },
     {
-      "id": "b437304f-774f-40fd-9088-e7c7d8b7c214",
+      "id": "46eb6203-86b1-4d20-9945-a5d5f824f02b",
       "role": "judge",
       "kind": "said",
-      "text": "Verdict: MISLEADING",
-      "at": 1793471852296
+      "text": "Verdict: CONTRADICTED",
+      "at": 1793475653310
     },
     {
-      "id": "fb1a79f7-f8a4-4285-bd1d-ea85c6bf5929",
+      "id": "503c6d92-bced-4ca7-801d-aa3f85e95ec8",
       "role": "clerk",
       "kind": "phase",
       "text": "The court has reached a verdict.",
-      "at": 1793471852296
+      "at": 1793475653310
     },
     {
-      "id": "f8bd3dcc-37a9-4e3a-a1c8-dfe8e63ad998",
+      "id": "05ceec7f-2cfb-4d0a-83af-fe5b73be6722",
       "role": "judge",
       "kind": "thinking",
       "text": "Reasoning…",
-      "at": 1793471852296
+      "at": 1793475653310
     },
     {
-      "id": "e9df4873-5dc4-4a16-a2b4-c7f638c6c39f",
+      "id": "63b23778-9984-416a-819a-eef825e18b60",
       "role": "judge",
       "kind": "said",
-      "text": "The claim presents observers' specific praises as if they define the overall assessment, when the record shows those praises were immediately qualified by substantial systemic violations—a misleading frame despite accurate details.",
-      "at": 1793471853664
+      "text": "**Verdict entered**: The claim conflates observers' praise for discrete election elements with an overall positive judgment the evidence does not sustain; the assessment was explicitly mixed, anchored in documented systemic deficits.",
+      "at": 1793475654616
+    }
+  ],
+  "leads": [
+    {
+      "id": "L1",
+      "by": "investigator",
+      "question": "What did the final report (issued \"months after\" the preliminary findings) conclude about the overall assessment of the election?",
+      "why": "The preliminary findings contain both positive and serious negative assessments; the final report may provide the authoritative overall judgment and could substantially change whether calling the assessment \"positive\" is accurate.",
+      "at": 1793475593248,
+      "round": 1,
+      "status": "reported",
+      "assignee": "investigator",
+      "assignedAt": 1793475602603,
+      "finding": "The ODIHR final report on Serbia's 25 October 2026 election was not located in available sources. The preliminary findings from 26 October 2026 remain the most authoritative ODIHR assessment documented in the ledger. Wikipedia's article on the election does not reference a subsequent final ODIHR report conclusion. The preliminary assessment documented both positive elements (high turnout, vigorous competition, positive election day evaluation) and serious negatives (polarization, state resource misuse, voter intimidation, media bias).",
+      "evidenceIds": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "reportedAt": 1793475613403
+    },
+    {
+      "id": "L2",
+      "by": "prosecutor",
+      "question": "What was the final assessment of Serbia's 25 October 2026 election in ODIHR's full report, released \"some months after\"—did it maintain, qualify, or revise the preliminary findings' mixed evaluation?",
+      "why": "The preliminary findings mixed praise for turnout and election day with serious criticism of polarization, state resource misuse, intimidation, and violence; the final report could confirm or contradict the claim of a \"positive assessment.\"",
+      "at": 1793475594964,
+      "round": 1,
+      "status": "reported",
+      "assignee": "prosecutor",
+      "assignedAt": 1793475602603,
+      "finding": "No publicly available final report from ODIHR on the 25 October 2026 Serbian election could be located. The evidence on the ledger (S1) is limited to ODIHR's preliminary findings issued 26 October 2026. The document explicitly states a final report would follow \"some months after the end of the election process,\" but it has not been indexed in searchable sources. Therefore, the question of whether the final assessment maintained, qualified, or revised the mixed preliminary evaluation cannot be resolved with available evidence.",
+      "evidenceIds": [],
+      "reportedAt": 1793475617827
+    },
+    {
+      "id": "L3",
+      "by": "defender",
+      "question": "What is the exact language and tone of the \"positive assessment\" statement from international observers? Does the preliminary findings document use the word \"positive\" to characterize the overall assessment, or only specific aspects?",
+      "why": "The claim states observers \"gave...a positive assessment,\" but the source's opening sentence emphasizes \"profound polarization\" and serious compromises alongside the positive elements, affecting whether the overall characterization is accur",
+      "at": 1793475598424,
+      "round": 1,
+      "status": "open"
+    }
+  ],
+  "rebuttals": [
+    {
+      "id": "c503f974-a146-46aa-b723-ed884f55e640",
+      "challengeId": "C2",
+      "by": "investigator",
+      "response": "Fair point. I cited E2 in isolation to confirm praise for turnout and competition, but E2 is excerpted from E1's longer sentence that immediately negates it with \"but unfolded in profound polarization.\" E2 alone misrepresents the full judgment. ODIHR did not characterize the overall election assessment as \"positive.\"",
+      "concede": true,
+      "at": 1793475634113
+    },
+    {
+      "id": "9bae8182-3e2f-47ed-a43c-1ae1307c1a8f",
+      "challengeId": "C1",
+      "by": "prosecutor",
+      "response": "Conceded. My language was imprecise. The evidence shows observers used \"positively assessed\" narrowly for election day operations (E3, E4). The overall assessment framed the election with \"profound polarization\" and systemic deficits—not positive terms. I should not have accepted the framing that observers gave an overall \"positive assessment.\"",
+      "concede": true,
+      "at": 1793475635230
+    },
+    {
+      "id": "39a43338-8fcd-4503-8b8e-1b58579c5214",
+      "challengeId": "C4",
+      "by": "investigator",
+      "response": "Correct. E3 documents positive assessment of election day operations only, not the overall election. Citing it early without emphasis on its scope could mislead the court into conflating partial, conditional praise with an overall positive judgment—the precise error the claim makes. The preliminary findings' opening frames the overall assessment critically, not positively.",
+      "concede": true,
+      "at": 1793475636172
+    },
+    {
+      "id": "4252bee3-9054-4b72-833c-ab4a0b49479c",
+      "challengeId": "C3",
+      "by": "prosecutor",
+      "response": "Conceded. I conflated observers' positive assessment of election day procedures (E3, E4) with an overall positive assessment of the election. The evidence does not support an overall positive characterization. The claim conflates these distinct judgments, which is a factual misrepresentation, not merely misleading framing.",
+      "concede": true,
+      "at": 1793475637220
+    }
+  ],
+  "decisions": [
+    {
+      "at": 1793475602603,
+      "action": "pursue",
+      "detail": "Editor assigned L1 to the investigator and L2 to the prosecutor."
+    },
+    {
+      "at": 1793475638421,
+      "action": "call_judge",
+      "detail": "Editor sent the case to the judge."
+    }
+  ],
+  "phaseLog": [
+    {
+      "phase": "investigation",
+      "round": 1,
+      "at": 1793475577880
+    },
+    {
+      "phase": "awaiting_editor",
+      "round": 1,
+      "at": 1793475601401
+    },
+    {
+      "phase": "leads",
+      "round": 2,
+      "at": 1793475602603
+    },
+    {
+      "phase": "cross_examination",
+      "round": 3,
+      "at": 1793475617827
+    },
+    {
+      "phase": "rebuttal",
+      "round": 4,
+      "at": 1793475631977
+    },
+    {
+      "phase": "awaiting_editor",
+      "round": 4,
+      "at": 1793475637220
+    },
+    {
+      "phase": "deliberation",
+      "round": 4,
+      "at": 1793475638421
+    },
+    {
+      "phase": "verdict",
+      "round": 4,
+      "at": 1793475653310
     }
   ],
   "agentIds": {
-    "prosecutor": "86ca2f5a-25c6-403f-8957-01f189bbe4f8",
-    "defender": "1af12078-2e34-4e44-833d-2400576cab2d",
-    "investigator": "46cfd3c8-c546-490b-a814-73c41aaba40b",
-    "judge": "ac01283a-91d9-4775-a852-432759372ac1"
+    "prosecutor": "bf892469-e2b5-4e09-9aca-c10f260d0df1",
+    "defender": "220ae703-c122-4dee-9033-454f65a2946a",
+    "investigator": "bbfa5df8-f393-428d-bf5a-8b9515c4347c",
+    "judge": "ebc23fe3-3a94-4c44-bd78-585e4a683cbd"
   },
   "busy": {},
   "turns": [
     {
       "role": "prosecutor",
       "round": 1,
-      "startedAt": 1793471784724,
-      "endedAt": 1793471805093
+      "startedAt": 1793475577883,
+      "endedAt": 1793475599243
     },
     {
       "role": "defender",
       "round": 1,
-      "startedAt": 1793471784725,
-      "endedAt": 1793471806432
+      "startedAt": 1793475577884,
+      "endedAt": 1793475601401
     },
     {
       "role": "investigator",
       "round": 1,
-      "startedAt": 1793471784725,
-      "endedAt": 1793471807342
+      "startedAt": 1793475577884,
+      "endedAt": 1793475596896
+    },
+    {
+      "role": "defender",
+      "round": 1,
+      "startedAt": 1793475601401,
+      "endedAt": 1793475602784
     },
     {
       "role": "prosecutor",
       "round": 2,
-      "startedAt": 1793471805839,
-      "endedAt": 1793471819523
+      "startedAt": 1793475602604,
+      "endedAt": 1793475617827
     },
     {
       "role": "investigator",
       "round": 2,
-      "startedAt": 1793471812556,
-      "endedAt": 1793471833847
+      "startedAt": 1793475602604,
+      "endedAt": 1793475614475
+    },
+    {
+      "role": "prosecutor",
+      "round": 3,
+      "startedAt": 1793475617828,
+      "endedAt": 1793475629172
     },
     {
       "role": "defender",
-      "round": 2,
-      "startedAt": 1793471813328,
-      "endedAt": 1793471840202
+      "round": 3,
+      "startedAt": 1793475617828,
+      "endedAt": 1793475631977
     },
     {
       "role": "investigator",
-      "round": 2,
-      "startedAt": 1793471833848,
-      "endedAt": 1793471841628
+      "round": 3,
+      "startedAt": 1793475617828,
+      "endedAt": 1793475631478
+    },
+    {
+      "role": "prosecutor",
+      "round": 3,
+      "startedAt": 1793475629880,
+      "endedAt": 1793475631977
+    },
+    {
+      "role": "prosecutor",
+      "round": 4,
+      "startedAt": 1793475631978,
+      "endedAt": 1793475637220
+    },
+    {
+      "role": "investigator",
+      "round": 4,
+      "startedAt": 1793475631979,
+      "endedAt": 1793475637220
+    },
+    {
+      "role": "defender",
+      "round": 4,
+      "startedAt": 1793475631980,
+      "endedAt": 1793475633216
+    },
+    {
+      "role": "prosecutor",
+      "round": 4,
+      "startedAt": 1793475637220,
+      "endedAt": 1793475642503
     },
     {
       "role": "judge",
-      "round": 2,
-      "startedAt": 1793471840202,
-      "endedAt": 1793471853664
+      "round": 4,
+      "startedAt": 1793475638422,
+      "endedAt": 1793475653310
+    },
+    {
+      "role": "judge",
+      "round": 4,
+      "startedAt": 1793475653310,
+      "endedAt": 1793475654616
     }
   ],
-  "articleSourceId": "S1"
+  "autopilot": true,
+  "articleSourceId": "S1",
+  "afterLeads": "cross_examination"
 }

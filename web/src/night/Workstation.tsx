@@ -11,11 +11,11 @@ type Geometry = { desk: string; monitor: { x: number; y: number; w: number; h: n
 
 export const DESKS: Record<Advocate, Geometry> = {
   // foreground left, cropped by the frame: closest, largest, darkest
-  prosecutor: { desk: "polygon(-80px 760px, 420px 760px, 452px 812px, -80px 812px)", monitor: { x: 116, y: 596, w: 230, h: 150 }, lamp: { x: 372, y: 682, s: 1.2 }, tray: { x: 300, y: 786, s: 1.1 }, plate: { x: 150, y: 772, s: 1.15 } },
+  prosecutor: { desk: "polygon(-80px 760px, 420px 760px, 452px 812px, -80px 812px)", monitor: { x: 116, y: 596, w: 230, h: 150 }, lamp: { x: 30, y: 682, s: 1.2 }, tray: { x: 300, y: 786, s: 1.1 }, plate: { x: 150, y: 772, s: 1.15 } },
   // foreground right, mirrored
-  defender: { desk: "polygon(1180px 760px, 1680px 760px, 1680px 812px, 1148px 812px)", monitor: { x: 1254, y: 596, w: 230, h: 150 }, lamp: { x: 1182, y: 682, s: 1.2 }, tray: { x: 1196, y: 786, s: 1.1 }, plate: { x: 1300, y: 772, s: 1.15 } },
+  defender: { desk: "polygon(1180px 760px, 1680px 760px, 1680px 812px, 1148px 812px)", monitor: { x: 1254, y: 596, w: 230, h: 150 }, lamp: { x: 1514, y: 682, s: 1.2 }, tray: { x: 1196, y: 786, s: 1.1 }, plate: { x: 1300, y: 772, s: 1.15 } },
   // mid-ground left, in front of the archive: further away, smaller
-  investigator: { desk: "polygon(206px 556px, 440px 556px, 452px 604px, 196px 604px)", monitor: { x: 262, y: 468, w: 128, h: 86 }, lamp: { x: 410, y: 520, s: 0.62 }, tray: { x: 214, y: 560, s: 0.6 }, plate: { x: 300, y: 574, s: 0.55 } },
+  investigator: { desk: "polygon(206px 556px, 440px 556px, 452px 604px, 196px 604px)", monitor: { x: 262, y: 468, w: 128, h: 86 }, lamp: { x: 216, y: 520, s: 0.62 }, tray: { x: 214, y: 560, s: 0.6 }, plate: { x: 300, y: 574, s: 0.55 } },
 };
 
 /** One agent's physical workstation. Every visible state is driven by the case. */
@@ -32,19 +32,21 @@ export function Workstation({ role, c, onOpen, active }: { role: Advocate; c: Ca
   return (
     <div className="station absolute inset-0" data-active={active || undefined} style={{ pointerEvents: "none" }}>
       {/* desk surface */}
-      <div className="absolute mat-walnut" style={{ left: 0, top: 0, width: 1600, height: 900, clipPath: g.desk, filter: role === "investigator" ? "brightness(.42)" : "brightness(.38)" }} aria-hidden>
+      <div className="absolute mat-oak" style={{ left: 0, top: 0, width: 1600, height: 900, clipPath: g.desk, filter: role === "investigator" ? "brightness(.92)" : "brightness(.88) saturate(1.05)" }} aria-hidden>
         <div className="absolute inset-0" style={{ background: busy ? `radial-gradient(14% 10% at ${g.lamp.x / 16}% ${(g.lamp.y + 110 * g.lamp.s) / 9}%, rgba(255,214,150,.38), transparent)` : "none", transition: "background .8s" }} />
       </div>
 
       {/* desk front: thickness, and the cabinet below falling into shadow */}
       {role !== "investigator" && (
-        <div className="absolute mat-walnut" aria-hidden style={{ left: 0, top: 0, width: 1600, height: 900, clipPath: role === "prosecutor" ? "polygon(-80px 812px, 452px 812px, 452px 830px, 440px 900px, -80px 900px)" : "polygon(1148px 812px, 1680px 812px, 1680px 900px, 1160px 900px, 1148px 830px)", filter: "brightness(.32)" }} />
+        <div className="absolute mat-oak" aria-hidden style={{ left: 0, top: 0, width: 1600, height: 900, clipPath: role === "prosecutor" ? "polygon(-80px 812px, 452px 812px, 452px 830px, 440px 900px, -80px 900px)" : "polygon(1148px 812px, 1680px 812px, 1680px 900px, 1160px 900px, 1148px 830px)", filter: "brightness(.62)" }} />
       )}
       {role !== "investigator" && <div className="absolute" aria-hidden style={{ left: 0, top: 0, width: 1600, height: 900, clipPath: role === "prosecutor" ? "polygon(-80px 811px, 452px 811px, 452px 813px, -80px 813px)" : "polygon(1148px 811px, 1680px 811px, 1680px 813px, 1148px 813px)", background: "rgba(255,214,160,.3)" }} />}
       {/* paper tray: one sheet per verified exhibit this agent entered */}
       <div className="absolute" style={{ left: g.tray.x, top: g.tray.y, transform: `scale(${g.tray.s})`, transformOrigin: "0 0" }} aria-hidden>
+        {/* a wire in-tray, so the sheets sit in something */}
+        <div className="absolute" style={{ left: -6, top: 8, width: 78, height: 30, transform: "skewX(-18deg)", border: "2px solid #4a4a46", borderTop: "none", background: "rgba(40,40,36,.12)" }} />
         {Array.from({ length: Math.min(sheets, 8) }, (_, i) => (
-          <motion.div key={i} initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute mat-paper" style={{ left: (i % 2) * 2, top: -i * 2.2, width: 64, height: 40, transform: `skewX(-18deg) rotate(${(i % 3) - 1}deg)` }} />
+          <motion.div key={i} initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute" style={{ left: (i % 2) * 2, top: 10 - i * 2.2, width: 64, height: 26, transform: `skewX(-18deg) rotate(${(i % 3) - 1}deg)`, background: "#f4ecd8", boxShadow: "0 1px 1px rgba(60,40,20,.3)", borderBottom: "1px solid #d8ccb0" }} />
         ))}
       </div>
 

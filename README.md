@@ -21,16 +21,38 @@ Most election misinformation is not invented from nothing. It is a real sentence
 - **Fact vs framing:** challenges are tagged as *factual* (is it true?) or *framing* (what was selected, emphasised or left out). The Judge lists framing problems separately from factual findings.
 - **No consensus-as-proof:** agreement between agents never counts as evidence.
 
-## The experience: the Night Shift
+## The experience: the newsroom
 
-You are an investigative editor walking into a newsroom at night. There are no pages. The camera moves between stations in one room (see [`DESIGN.md`](DESIGN.md)):
+You are the editor of a sunlit election newsroom. Each Mozaik agent is an illustrated reporter, labelled as an AI agent. You watch them work, and you make the calls that steer the investigation. There are no pages. The camera moves between stations in one room (see [`DESIGN.md`](DESIGN.md)):
 
 | Station | Where | What you do |
 |---|---|---|
-| **Election table** | The lit walnut table, with a map laid flat | Choose a brass pin (Serbia, United States, South Africa) and the camera moves in on that country's dossier: date, context quoted verbatim from primary sources, the sources, and a test claim you can put on trial |
+| **Election table** | The oak table, with a map laid flat | Choose a brass pin (Serbia, United States, South Africa) and the camera moves in on that country's dossier: date, context quoted verbatim from primary sources, the sources, and a test claim you can put on trial |
 | **Case desk** | The manila folder | Open your own case on a typed intake sheet, or read the open case's file |
 | **The investigators** | Three workstations | Each monitor shows that agent's live Mozaik activity, its banker's lamp is lit only while its loop is running, and its paper tray grows with every quote it gets verified. Click a monitor to read the agent's file: positions by round, reasoning (labelled *not evidence*), challenges and its research trail |
 | **Evidence wall** | The cork board at the back | Exhibits fly in from the desk that entered them. Strings are coloured by bearing (red only for contradictions), disagreements arc between advocate tags, sources and positions sit on the wings, and the ruling is pinned when it's delivered. Open any document, stamp the ruling, save it, or reopen it with an objection |
+
+### Investigations that evolve, with you as editor
+
+A case is no longer one pass and a verdict:
+
+1. **Investigation:** three reporters work concurrently, citing verified quotes and raising **leads**, questions worth separate research.
+2. **Your decision:** assign leads to specific desks (up to three, in any combination), write your own lead, or skip ahead.
+3. **Leads:** assigned desks research **concurrently**, often on leads another desk raised, and report back on index cards.
+4. **Cross-examination:** all three reporters challenge one another, each challenge tagged factual or framing.
+5. **Rebuttal:** only the challenged reporters are summoned, in parallel, to answer or concede.
+6. **Your decision:** send the case to the judge, or send someone back out for more reporting.
+7. **Verdict:** the editor-in-chief rules. **Objection!** reopens the case with your argument and source.
+
+Forms of Mozaik concurrency on show:
+
+- **Fan-out:** one summons event starts three independent loops.
+- **Selective fan-out:** only the desks you assigned react to a lead summons.
+- **Handoff:** a lead raised by one agent is researched by another.
+- **Targeted reaction:** a rebuttal summons reaches only the challenged agents.
+- **Event-driven coordination:** the Clerk advances on filing, lead-report and rebuttal events, never on a timer or a script.
+
+The bundled recording (`web/public/sample-case.json`, a real run) goes through every stage: two leads ran concurrently on two desks, and four challenges were rebutted and conceded. The investigator changed position, and the ruling was *Contradicted (82%)*. A replay **stops at each editor's decision** and waits for you. In that recording the decisions were taken by the test autopilot, and the UI says so.
 
 `Esc` or **Back to the room** always returns to the overview without losing the case. A **text view** of every case is one click away, for accessibility and as a non-spatial fallback. Narrow screens get a small station strip. Reduced-motion users get instant camera cuts and no parallax. Visual QA (screenshots, critique and scores) is in [`VISUAL_QA.md`](VISUAL_QA.md).
 

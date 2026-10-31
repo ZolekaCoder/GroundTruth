@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { getCase, MODEL } from "../court/runtime.js";
-import { openCase, providerError, raiseObjection } from "../court/court.js";
+import { decide, openCase, providerError, raiseObjection } from "../court/court.js";
 import { subscribe } from "../court/bus.js";
 import { publicCase } from "../court/types.js";
 
@@ -47,6 +47,16 @@ export function createServer() {
     if (!argument || typeof argument !== "string") return res.status(400).json({ error: "State your objection." });
     try {
       const c = await raiseObjection(req.params.id, argument, url);
+      res.json(publicCase(c));
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+    }
+  });
+
+  // The editor's decisions: which leads to chase and who chases them; when to call the judge.
+  app.post("/api/cases/:id/decision", async (req, res) => {
+    try {
+      const c = await decide(req.params.id, req.body);
       res.json(publicCase(c));
     } catch (err) {
       res.status(400).json({ error: (err as Error).message });
