@@ -1,0 +1,27 @@
+{
+  "name": "@groundtruth/server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "prove": "tsx src/scripts/prove-concurrency.ts",
+    "record": "tsx src/scripts/prove-concurrency.ts \"International observers gave Serbia’s 25 October 2026 election a positive assessment, praising high voter turnout and vigorous competition.\" ../web/public/sample-case.json https://odihr.osce.org/node/666908",
+    "check-evidence": "tsx src/scripts/check-evidence.ts"
+  },
+  "dependencies": {
+    "@mozaik-ai/core": "^4.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

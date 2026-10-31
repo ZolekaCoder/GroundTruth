@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "The Ground Truth — Put This On Trial",
+  "short_name": "Ground Truth",
+  "version": "1.0.0",
+  "description": "Highlight any claim, including election claims, on any site, right-click, and put it on trial before four Mozaik agents.",
+  "permissions": ["contextMenus", "storage"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "The Ground Truth" },
+  "options_ui": { "page": "popup.html", "open_in_tab": false },
+  "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" }
+}
