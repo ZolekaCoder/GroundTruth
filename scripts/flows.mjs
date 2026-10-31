@@ -11,6 +11,8 @@ const step = async (name, fn) => { try { await fn(); console.log("PASS", name); 
 
 await page.goto("http://localhost:5173/?view=2d", { waitUntil: "networkidle" });
 await page.waitForTimeout(1500);
+await page.getByRole("button", { name: "Enter the newsroom" }).click().catch(() => {});
+await page.waitForTimeout(1200);
 await step("1 enter the newsroom", async () => { await page.getByText("The election table · pick a country").waitFor(); });
 await step("2 open a country dossier", async () => {
   await page.getByRole("button", { name: /Open the Serbia dossier/ }).click({ force: true });

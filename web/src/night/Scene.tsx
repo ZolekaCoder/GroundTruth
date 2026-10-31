@@ -42,6 +42,9 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
   const [px, setPx] = useState({ x: 0, y: 0 });
   const [toast, setToast] = useState<string | null>(null);
   const verdictCount = useRef(c?.verdicts.length ?? 0);
+  // the opening: shown on arrival at the empty newsroom, once per session
+  const [intro, setIntro] = useState(() => { try { return !c && !recorded && !sessionStorage.getItem("gt-intro-seen"); } catch { return !c && !recorded; } });
+  const closeIntro = () => { setIntro(false); try { sessionStorage.setItem("gt-intro-seen", "1"); } catch { /* private mode */ } };
   // the room's clock: real time for a live case, the replay's own clock for a recording
   const [tick, setTick] = useState(Date.now());
   useEffect(() => { if (!live) return; const iv = setInterval(() => setTick(Date.now()), 400); return () => clearInterval(iv); }, [live]);
@@ -169,8 +172,8 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 sm:p-5">
         <div className="pointer-events-auto">
           <div className="inline-block bg-[#1b1611]/85 px-3 py-2" style={{ boxShadow: "0 4px 12px rgba(0,0,0,.25)" }}>
-            <p className="whitespace-nowrap font-serif text-[17px] font-semibold leading-none text-paper sm:text-[19px]">The Ground Truth</p>
-            <p className="typed mt-1 hidden text-[11px] text-paper/70 sm:block">Election desk · {cam.label}</p>
+            <p className="whitespace-nowrap font-serif text-[20px] font-semibold leading-none text-paper sm:text-[24px]">The Ground Truth</p>
+            <p className="typed mt-1 hidden text-[13px] text-[#e0b04f] sm:block">ELECTION DESK · {cam.label}</p>
           </div>
           {focus !== "overview" && (
             <button onClick={back} className="hint mt-2 flex items-center gap-1.5 rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper hover:bg-[#2b241c]">
@@ -180,9 +183,9 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
         </div>
         <div className="pointer-events-auto flex max-w-[60vw] flex-col items-end gap-2">
           {recorded ? (
-            <div className="hint flex flex-wrap items-center justify-end gap-2 bg-[#e8dcbf] px-3 py-1.5 text-[#2b241c]" style={{ boxShadow: "0 4px 10px rgba(0,0,0,.4)" }}>
+            <div className="hint flex items-center justify-end gap-2 whitespace-nowrap bg-[#e8dcbf] px-3 py-1.5 text-[#2b241c]" style={{ boxShadow: "0 4px 10px rgba(0,0,0,.4)" }}>
               <strong className="font-semibold">Recorded investigation</strong>
-              <span className="typed hidden text-[11px] sm:inline">a real run, {c ? new Date(c.openedAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : ""} · {replayPaused ? "paused at a decision" : "replayed 4×"}{c?.autopilot ? " · editor decisions by test autopilot" : ""}</span>
+              <span className="typed hidden whitespace-nowrap text-[13px] lg:inline">real run · {c ? new Date(c.openedAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""} · {replayPaused ? "paused at a decision" : "replay"}{c?.autopilot ? " · decisions by autopilot" : ""}</span>
               {onRestartReplay && <button onClick={onRestartReplay} className="inline-flex items-center gap-1 underline"><RotateCcw size={12} /> Replay</button>}
             </div>
           ) : c ? (
@@ -220,16 +223,17 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
       {(vp.w < 700 || mode === "3d") && !overlay && (
         <nav aria-label="Stations" className={`absolute flex justify-between gap-1 rounded-sm bg-[#1b1611]/90 p-1 ${vp.w < 700 ? "inset-x-2 bottom-10" : "bottom-14 left-4"}`}>
           {([["overview", "Room"], ["table", "Table"], ["wall", "Wall"], ["investigator", "Invest."], ["prosecutor", "Prosec."], ["defender", "Defence"]] as [Focus, string][]).filter(([f]) => f !== "overview" || mode === "3d").map(([f, l]) => (
-            <button key={f} onClick={() => go(f, f === "table" || f === "wall" || f === "overview" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-1 py-1.5 text-[11.5px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper/80"}`}>{l}</button>
+            <button key={f} onClick={() => go(f, f === "table" || f === "wall" || f === "overview" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-2.5 py-2 text-[15px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper/80"}`}>{l}</button>
           ))}
         </nav>
       )}
       {mode === "3d" && focus === "wall" && !overlay && c && (c.evidence.length > 0 || c.verdicts.length > 0) && (
         <nav aria-label="Exhibits on the wall" className="absolute bottom-24 left-1/2 flex max-w-[92vw] -translate-x-1/2 flex-wrap justify-center gap-1 rounded-sm bg-[#1b1611]/85 p-1">
-          {c.evidence.map((e) => <button key={e.id} onClick={() => setOverlay({ kind: "evidence", id: e.id })} aria-label={`Exhibit ${e.id}: ${e.quote}`} className="typed rounded-sm px-2 py-1 text-[12px] text-paper hover:bg-paper hover:text-[#2b241c]">{e.id}</button>)}
-          {c.verdicts.length > 0 && <button onClick={() => setOverlay({ kind: "verdict" })} aria-label="RULING OF THE COURT" className="typed rounded-sm bg-[#a3302a] px-2 py-1 text-[12px] text-white">Ruling</button>}
+          {c.evidence.map((e) => <button key={e.id} onClick={() => setOverlay({ kind: "evidence", id: e.id })} aria-label={`Exhibit ${e.id}: ${e.quote}`} className="typed rounded-sm px-2.5 py-1.5 text-[15px] text-paper hover:bg-paper hover:text-[#2b241c]">{e.id}</button>)}
+          {c.verdicts.length > 0 && <button onClick={() => setOverlay({ kind: "verdict" })} aria-label="RULING OF THE COURT" className="typed rounded-sm bg-[#a3302a] px-2.5 py-1.5 text-[15px] text-white">Ruling</button>}
         </nav>
       )}
+      <AnimatePresence>{intro && !c && <Intro onEnter={closeIntro} onDemo={() => { closeIntro(); onDemo(); }} />}</AnimatePresence>
       {/* documents */}
       <div className={`pointer-events-none absolute inset-0 flex items-center p-4 ${wide ? "justify-end pr-8" : "justify-center"}`}>
         <AnimatePresence mode="wait">
@@ -256,5 +260,43 @@ function Tag({ x, y, text, small }: { x: number; y: number; text: string; small?
       <span className="relative flex size-1.5"><span className="absolute inline-flex size-full animate-ping rounded-full bg-[#e6a95c] opacity-70" /><span className="relative inline-flex size-1.5 rounded-full bg-[#e6a95c]" /></span>
       {text}
     </div>
+  );
+}
+
+const BREAKING = [
+  "Serbia: early parliamentary elections held 25 October · OSCE/ODIHR preliminary findings published 26 October",
+  "United States: federal general election, Tuesday 3 November 2026",
+  "South Africa: local government elections, 4 November 2026 · new Disinformation Code in force",
+];
+
+/** The opening moment: what this is, why now, and two ways in. */
+function Intro({ onEnter, onDemo }: { onEnter: () => void; onDemo: () => void }) {
+  const line = BREAKING.join("    ●    ");
+  return (
+    <motion.section role="dialog" aria-label="The Ground Truth: Election Desk" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.6 } }}
+      className="absolute inset-0 z-40 flex flex-col" style={{ background: "linear-gradient(90deg, rgba(14,18,24,.92) 0%, rgba(14,18,24,.78) 45%, rgba(14,18,24,.35) 75%, rgba(14,18,24,.5) 100%)" }}>
+      <div className="flex items-stretch bg-[#c0392b] text-white">
+        <span className="flex items-center gap-2 bg-[#8e2318] px-4 py-2 font-mono text-[15px] font-bold tracking-widest"><span className="breaking-dot size-2.5 rounded-full bg-white" />BREAKING</span>
+        <div className="relative flex-1 overflow-hidden py-2"><div className="ticker-run flex w-max whitespace-nowrap font-mono text-[15px]"><span className="pr-16">{line}</span><span className="pr-16">{line}</span></div></div>
+      </div>
+      <div className="flex flex-1 items-center px-6 sm:px-14">
+        <div className="max-w-[880px]">
+          <motion.p initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="font-mono text-[15px] tracking-[0.2em] text-[#e0b04f]">ELECTION DESK · OCTOBER–NOVEMBER 2026</motion.p>
+          <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }} className="mt-3 font-serif text-[clamp(52px,8vw,112px)] font-semibold leading-[0.95] text-[#f7f1e3]">The Ground Truth</motion.h1>
+          <motion.p initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mt-5 max-w-[42ch] text-[clamp(19px,2vw,24px)] leading-snug text-[#e9e4d8]">
+            Three elections in ten days. Step into the newsroom, put a claim on trial, and direct three AI reporters as they investigate it in parallel. A judge rules only on verified evidence.
+          </motion.p>
+          <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap gap-3">
+            <button onClick={onEnter} className="bg-[#f7f1e3] px-6 py-3.5 text-[17px] font-semibold text-[#14110d] hover:bg-[#e0b04f]">Enter the newsroom</button>
+            <button onClick={onDemo} className="border-2 border-[#f7f1e3] px-6 py-3 text-[17px] font-semibold text-[#f7f1e3] hover:bg-white/10">Watch the Serbia investigation <span className="font-normal opacity-80">(recorded)</span></button>
+          </motion.div>
+          <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-10 grid max-w-[760px] gap-3 sm:grid-cols-3">
+            {[["Serbia", "Voted 25 October"], ["United States", "Votes 3 November"], ["South Africa", "Votes 4 November"]].map(([k, v]) => (
+              <li key={k} className="border-l-4 border-[#c0392b] bg-black/30 px-4 py-3"><p className="font-serif text-[22px] text-white">{k}</p><p className="font-mono text-[14px] text-[#e0b04f]">{v}</p></li>
+            ))}
+          </motion.ul>
+        </div>
+      </div>
+    </motion.section>
   );
 }

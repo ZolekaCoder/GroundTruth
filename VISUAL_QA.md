@@ -171,3 +171,29 @@ All iteration used the recording or the empty room. **No API calls were made.** 
 - **No post-processing** (ambient occlusion, bloom). This was left out to keep it reliable on modest GPUs and in software rendering.
 - **The room is sparse in places**, with large wall areas left empty.
 - **The 3D bundle is about 290 KB gzipped**, lazy-loaded, plus about 44 MB of assets fetched on demand.
+
+
+---
+
+# Revision 4: people, identity, opening, readability
+
+Every shot used the recording or the empty room. **No API calls were made.**
+
+| Shot | Check | Finding → change |
+|---|---|---|
+| `30-intro-1440` | Opening moment | A breaking-news ticker, the title, the Election Desk line, the three elections and two ways in. The body text sat over a busy part of the room → the overlay gradient now darkens the left side. |
+| `31-room-1440` | Does it feel empty? Is it an election desk? | People are present (three reporters, the editor, a researcher), with desk signs and the election screen. **Problems:** the pendant lamps hid the wall sign; the sign's title and "ELECTION DESK" overlapped (the width was estimated, not measured); the outer desk signs were cropped. → Lamps removed, text measured, signs pulled inward. |
+| `32-room-1440` | Readability | The sign reads cleanly. The Investigation sign hid behind the Prosecution sign → raised and offset. |
+| `34-working-1440` (`?speed=1`) | Desks while working | All three hanging signs read "● Working now", the monitors stream real activity, clippings and strings fill the wall, and the election screen shows the case on the desk. The election screen's rows were small from across the room → enlarged, with fewer words. |
+| `35-3d-*` journeys | Function | **11/11 steps pass** (including the opening screen), 0 console errors. |
+| `35-3d-07`, `35-3d-08` | Close-ups | The desk reads at a glance. Clipping quotes on the wall were still small → fewer words at a larger size (`37-wall-1440`). |
+| `36-2d-fallback-*` | Fallback | **11/11 steps pass.** |
+
+**Answers to the four questions:**
+
+- **Does the room still feel empty?** No: five people, three live screens, a live election board, a ticker and a populated wall.
+- **Can you instantly tell it's an election desk?** Yes: the opening screen, the wall sign, the election screen and the ticker, before any interaction.
+- **Is the text readable?** The HUD, dock, desk signs and monitors are, at overview distance. Clipping bodies are legible at the wall, with full text in the document sheets.
+- **Are the agent desks prominent?** Yes: large monitors and named hanging signs with live status.
+
+**Still true:** the people are stylised, faceless figures, not realistic characters, and there is no post-processing.

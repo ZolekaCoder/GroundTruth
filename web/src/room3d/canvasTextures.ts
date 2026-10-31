@@ -97,9 +97,10 @@ export function drawClipping(g: CanvasRenderingContext2D, e: Evidence, src: Sour
   if (img) { cover(g, img, 0, y, W, 230, !isReport(src)); y += 230; }
   y += 24;
   if (!isReport(src) && src) { g.fillStyle = "#1f1a14"; g.font = "700 34px 'Newsreader'"; y += 8 + 38 * wrap(g, src.title, 24, y + 26, W - 48, 38, 2); }
-  g.fillStyle = "#2b241c"; g.font = `500 ${img ? 31 : 36}px 'Newsreader'`;
-  const lines = wrap(g, `“${short(e.quote, img ? 22 : 34)}”`, 24, y + 30, W - 48, img ? 38 : 44, img ? 5 : 8);
-  if (isReport(src)) { g.fillStyle = "rgba(250,220,60,.35)"; g.fillRect(18, y, W - 36, lines * (img ? 38 : 44) + 10); }
+  g.fillStyle = "#2b241c"; g.font = `600 ${img ? 40 : 46}px 'Newsreader'`;
+  const lh = img ? 47 : 54;
+  const lines = wrap(g, `“${short(e.quote, img ? 13 : 22)}”`, 24, y + 36, W - 48, lh, img ? 4 : 7);
+  if (isReport(src)) { g.fillStyle = "rgba(250,220,60,.35)"; g.fillRect(18, y, W - 36, lines * lh + 12); }
   g.fillStyle = "#6b5a3c"; g.font = "500 22px 'IBM Plex Mono'"; g.fillText(e.id, 24, H - 26);
   g.fillStyle = color; g.textAlign = "right"; g.fillText(label, W - 24, H - 26); g.textAlign = "left";
 }
@@ -141,19 +142,19 @@ export function drawScreen(g: CanvasRenderingContext2D, role: string, plate: str
   const W = 768, H = 448, ph = PHOSPHOR[role];
   const grd = g.createLinearGradient(0, 0, 0, H); grd.addColorStop(0, busy ? "#1c1d1a" : "#151614"); grd.addColorStop(1, "#0f100e");
   g.fillStyle = grd; g.fillRect(0, 0, W, H);
-  g.fillStyle = ph; g.font = "500 26px 'IBM Plex Mono'"; g.fillText(plate, 28, 46);
+  g.fillStyle = ph; g.font = "600 32px 'IBM Plex Mono'"; g.fillText(plate, 28, 48);
   g.textAlign = "right"; g.fillText(busy ? "● WORKING" : filing ? `R${filing.round} FILED` : hasCase ? "STANDBY" : "NO CASE", W - 28, 46); g.textAlign = "left";
   g.fillStyle = ph + "55"; g.fillRect(28, 62, W - 56, 2);
   g.fillStyle = ph;
   if (filing && !busy) {
-    g.font = "600 56px 'IBM Plex Mono'"; g.fillText(filing.timedOut ? "NO FILING" : stanceMeta(filing.stance).label.toUpperCase().slice(0, 18), 28, 150);
-    g.font = "400 30px 'IBM Plex Mono'"; g.fillText(`${filing.confidence}% confidence`, 28, 200);
-    if (filing.changed) { g.fillStyle = "#f2c98c"; g.fillText("REVISED after cross-examination", 28, 250); }
+    g.font = "700 72px 'IBM Plex Mono'"; g.fillText(filing.timedOut ? "NO FILING" : stanceMeta(filing.stance).label.toUpperCase().slice(0, 14), 28, 170);
+    g.font = "500 38px 'IBM Plex Mono'"; g.fillText(`${filing.confidence}% confidence`, 28, 230);
+    if (filing.changed) { g.fillStyle = "#f2c98c"; g.fillText("REVISED after cross-exam", 28, 290); }
   } else if (!hasCase) {
-    g.font = "400 28px 'IBM Plex Mono'"; wrap(g, purpose, 28, 120, W - 56, 38, 3);
+    g.font = "500 38px 'IBM Plex Mono'"; wrap(g, purpose, 28, 130, W - 56, 50, 3);
   } else {
-    g.font = "400 25px 'IBM Plex Mono'";
-    lines.slice(-8).forEach((l, i) => { const t = `> ${l.text}`; g.fillText(t.length > 46 ? `${t.slice(0, 45)}…` : t, 28, 110 + i * 40); });
+    g.font = "500 32px 'IBM Plex Mono'";
+    lines.slice(-7).forEach((l, i) => { const t = `> ${l.text}`; g.fillText(t.length > 38 ? `${t.slice(0, 37)}…` : t, 28, 116 + i * 46); });
   }
   for (let y = 0; y < H; y += 4) { g.fillStyle = "rgba(0,0,0,.18)"; g.fillRect(0, y, W, 1); }
 }
@@ -218,4 +219,55 @@ export function drawPoster(g: CanvasRenderingContext2D, atlasId: string, country
   }
   g.fillStyle = "#2b241c"; g.font = "500 30px 'IBM Plex Mono'"; g.fillText(election.toUpperCase().slice(0, 30), 40, H - 130);
   g.font = "700 46px 'Newsreader'"; g.fillText(new Date(date + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }), 40, H - 70);
+}
+
+/** The wall sign above the evidence board. */
+export function drawWallSign(g: CanvasRenderingContext2D) {
+  const W = 2048, H = 200;
+  g.clearRect(0, 0, W, H);
+  g.font = "700 104px 'Newsreader'"; const tw = g.measureText("The Ground Truth").width;
+  g.font = "600 60px 'IBM Plex Mono'"; const dw = g.measureText("ELECTION DESK").width;
+  const gap = 60, total = tw + gap * 2 + 4 + dw, x0 = (W - total) / 2;
+  g.fillStyle = "#f7f1e3"; g.font = "700 104px 'Newsreader'"; g.fillText("The Ground Truth", x0, 124);
+  g.fillStyle = "#e0b04f"; g.fillRect(x0 + tw + gap, 40, 4, 112);
+  const dx = x0 + tw + gap * 2 + 4;
+  g.fillStyle = "#f7f1e3"; g.font = "600 60px 'IBM Plex Mono'"; g.fillText("ELECTION DESK", dx, 100);
+  g.font = "500 26px 'IBM Plex Mono'"; g.fillStyle = "#e0b04f"; g.fillText("SERBIA · UNITED STATES · SOUTH AFRICA", dx + 2, 146);
+}
+
+/** The election status screen: the three elections, and what the desk is investigating now. */
+export function drawElectionScreen(g: CanvasRenderingContext2D, rows: { country: string; election: string; when: string; held: boolean }[], live: string | null, phase: string | null) {
+  const W = 1600, H = 900;
+  g.fillStyle = "#0f1820"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#c0392b"; g.fillRect(0, 0, W, 110);
+  g.fillStyle = "#fff"; g.font = "700 60px 'IBM Plex Mono'"; g.fillText("● ELECTION DESK · LIVE", 40, 76);
+  g.textAlign = "right"; g.font = "500 44px 'IBM Plex Mono'"; g.fillText(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), W - 40, 74); g.textAlign = "left";
+  rows.forEach((r, i) => {
+    const y = 200 + i * 150;
+    g.fillStyle = i % 2 ? "#13212b" : "#172833"; g.fillRect(0, y - 70, W, 140);
+    g.fillStyle = "#f2efe8"; g.font = "700 88px 'Newsreader'"; g.fillText(r.country, 40, y + 30);
+    g.textAlign = "right"; g.fillStyle = r.held ? "#e0b04f" : "#7fd08f"; g.font = "700 72px 'IBM Plex Mono'"; g.fillText(r.when.toUpperCase(), W - 40, y + 26); g.textAlign = "left";
+  });
+  g.fillStyle = "#1d2f3b"; g.fillRect(0, 660, W, 240);
+  g.fillStyle = "#e0b04f"; g.font = "600 36px 'IBM Plex Mono'"; g.fillText(live ? `ON THE DESK NOW · ${(phase ?? "").replace("_", "-").toUpperCase()}` : "NO CASE OPEN", 40, 720);
+  g.fillStyle = "#f2efe8"; g.font = "600 60px 'Newsreader'"; wrap(g, live ? `“${live}”` : "Pick an election at the table to open an investigation.", 40, 800, W - 80, 66, 2);
+}
+
+/** A long LED news ticker strip (scrolled by texture offset). */
+export function drawTicker(g: CanvasRenderingContext2D, items: string[]) {
+  const W = 4096, H = 128;
+  g.fillStyle = "#111"; g.fillRect(0, 0, W, H);
+  g.font = "600 56px 'IBM Plex Mono'";
+  let x = 30;
+  const text = items.join("   ●   ") + "   ●   ";
+  while (x < W) { g.fillStyle = "#ffcf5a"; g.fillText(text, x, 86); x += g.measureText(text).width; }
+}
+
+/** A sign hanging over an agent's desk. */
+export function drawDeskSign(g: CanvasRenderingContext2D, title: string, status: string, accent: string, busy: boolean) {
+  const W = 1024, H = 300;
+  g.fillStyle = "#f7f1e3"; g.fillRect(0, 0, W, H);
+  g.fillStyle = accent; g.fillRect(0, 0, 26, H);
+  g.fillStyle = "#1f1a14"; g.font = "700 92px 'Newsreader'"; g.fillText(title, 64, 130);
+  g.fillStyle = busy ? "#c0392b" : "#6b5a3c"; g.font = "600 46px 'IBM Plex Mono'"; g.fillText(`${busy ? "● " : ""}${status}`.slice(0, 34), 64, 230);
 }

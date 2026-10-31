@@ -7,7 +7,8 @@ import type { Dossier } from "../lib/elections";
 import { DOSSIERS, relativeDay } from "../lib/elections";
 import type { Focus } from "../night/Scene";
 import { AGENT_LOOK } from "../night/Workstation";
-import { canvasTexture, forgetWaiter, drawPoster, drawResearch, drawClaim, drawClipping, drawLead, drawMap, drawNewspaper, drawScreen, drawVerdict, sourceImage, MAP } from "./canvasTextures";
+import { Person, PEOPLE } from "./People3D";
+import { canvasTexture, forgetWaiter, drawPoster, drawResearch, drawWallSign, drawElectionScreen, drawTicker, drawDeskSign, drawClaim, drawClipping, drawLead, drawMap, drawNewspaper, drawScreen, drawVerdict, sourceImage, MAP } from "./canvasTextures";
 
 const A = "/assets/3d";
 const HDRI_ROT = Math.PI * 1.5; // chosen from screenshots: brightest view through the windows
@@ -19,7 +20,7 @@ type Shot = { pos: [number, number, number]; target: [number, number, number] };
 function deskShot(r: Advocate): Shot {
   const { pos, rot } = DESKS[r];
   const at = (x: number, y: number, z: number): [number, number, number] => [pos[0] + x * Math.cos(rot) + z * Math.sin(rot), y, pos[2] - x * Math.sin(rot) + z * Math.cos(rot)];
-  return { pos: at(0.55, 1.85, 2.15), target: at(0, 1.05, -0.2) };
+  return { pos: at(0.75, 1.8, 2.35), target: at(0.12, 1.3, -0.22) };
 }
 const PRESETS: Record<Focus, Shot> = {
   overview: { pos: [0.6, 2.55, 8.2], target: [0.1, 0.95, -0.9] },
@@ -162,8 +163,6 @@ function Lights() {
 function Furniture() {
   return (
     <Suspense fallback={null}>
-      <Prop name="modern_ceiling_lamp_01" height={0.55} position={[-0.7, 2.85, 1.25]} />
-      <Prop name="modern_ceiling_lamp_01" height={0.55} position={[0.7, 2.85, 1.25]} />
       <Prop name="wooden_display_shelves_01" height={2.1} position={[-6.55, 0, -0.6]} rotation={Math.PI / 2} />
       <Prop name="book_encyclopedia_set_01" width={0.7} position={[-6.55, 1.05, -0.6]} rotation={Math.PI / 2} />
       <Prop name="binder_notebook" width={0.32} position={[-6.5, 1.52, -0.25]} rotation={Math.PI / 2} />
@@ -175,7 +174,7 @@ function Furniture() {
       <Prop name="sofa_02" width={2.1} position={[5.3, 0, -1.2]} rotation={-Math.PI / 2} />
       <Prop name="coffee_table_round_01" width={0.8} position={[4.15, 0, -1.2]} />
       <Prop name="mid_century_lounge_chair" width={0.85} position={[4.3, 0, -3.3]} rotation={-Math.PI * 0.8} />
-      <Prop name="wall_clock" width={0.45} position={[3.4, 2.35, -4.92]} />
+      <Prop name="wall_clock" width={0.45} position={[6.1, 2.55, -4.92]} />
     </Suspense>
   );
 }
@@ -242,7 +241,7 @@ function ElectionTable({ c, focus, onPin, onCaseFolder }: { c: Case | null; focu
             {(focus === "table" || hover === p.id) && (
               <Html position={[0, 0.17, 0]} center distanceFactor={2.2} zIndexRange={[20, 0]}>
                 <button onPointerDown={(e) => e.stopPropagation()} onPointerUp={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onPin(p.id); }} aria-label={`Open the ${d.country} dossier: ${d.election}, ${relativeDay(d.date)}`}
-                  className="hint whitespace-nowrap rounded-sm bg-[#1b1611]/85 px-2 py-0.5 text-[13px] text-paper hover:bg-[#a3302a]">{d.country} · {relativeDay(d.date)}</button>
+                  className="hint whitespace-nowrap rounded-sm bg-[#1b1611]/85 px-2.5 py-1 text-[16px] text-paper hover:bg-[#a3302a]">{d.country} · {relativeDay(d.date)}</button>
               </Html>
             )}
           </group>
@@ -267,44 +266,62 @@ export const DESKS: Record<Advocate, DeskCfg> = {
 };
 const DESK_TOP = 0.75;
 
+// hanging signs lean toward the room's centre so the frame edge never crops them
+const SIGN_SHIFT: Record<Advocate, number> = { prosecutor: 0.55, defender: -0.6, investigator: 0.75 };
+const SIGN_Y: Record<Advocate, number> = { prosecutor: 2.45, defender: 2.45, investigator: 2.85 };
+const DESK_ACCENT: Record<Advocate, string> = { prosecutor: "#b23f2c", defender: "#5f6d3c", investigator: "#d4a03c" };
+const DESK_TITLE: Record<Advocate, string> = { prosecutor: "Prosecution", defender: "Defence", investigator: "Investigation" };
+
 function Workstation({ role, c, now, onOpen }: { role: Advocate; c: Case | null; now: number; onOpen: () => void }) {
   const cfg = DESKS[role], look = AGENT_LOOK[role];
   const busy = !!c?.busy[role];
   const lines = (c?.activity ?? []).filter((a) => a.role === role && a.kind !== "thinking");
   const filing = c?.filings.filter((f) => f.role === role).at(-1);
+  const onLead = !!c && c.phase === "leads" && c.leads.some((l) => l.assignee === role && l.status === "assigned");
   const screen = useCanvas(768, 448, (g) => drawScreen(g, role, look.plate, busy, lines, filing, !!c, look.purpose), [busy, lines.length, filing?.at, !!c]);
-  const plate = useCanvas(512, 96, (g) => { g.fillStyle = "#c9a250"; g.fillRect(0, 0, 512, 96); g.fillStyle = "#2a1d10"; g.font = "600 44px 'IBM Plex Mono'"; g.textAlign = "center"; g.fillText(look.plate, 256, 64); }, []);
+  const status = !c ? look.purpose : busy ? (onLead ? "Chasing a lead" : "Working now") : filing ? `Filed: ${filing.timedOut ? "no filing" : filing.stance}` : "Standing by";
+  const sign = useCanvas(1024, 300, (g) => drawDeskSign(g, `${DESK_TITLE[role]} desk`, status, DESK_ACCENT[role], busy), [status, busy]);
   const chair = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => { if (chair.current) chair.current.rotation.y = (busy ? Math.sin(clock.elapsedTime * 1.3) * 0.12 : 0.25); });
+  useFrame(({ clock }) => { if (chair.current) chair.current.rotation.y = busy ? Math.sin(clock.elapsedTime * 1.1) * 0.06 : 0.12; });
   const sheets = c?.evidence.filter((e) => e.citedBy === role).length ?? 0;
   const speech = latestSpeech(c, role, now);
+  const pose = busy ? (onLead ? "phone" : "typing") : c ? "reading" : "typing";
   return (
     <group position={cfg.pos} rotation={[0, cfg.rot, 0]}>
       <Suspense fallback={null}>
-        <Prop name="metal_office_desk" width={1.5} position={[0, 0, 0]} />
-        <group ref={chair} position={[0, 0, 0.7]}><Prop name="modern_arm_chair_01" height={0.95} position={[0, 0, 0]} /></group>
-        <Prop name="desk_lamp_arm_01" height={0.5} position={[0.5, DESK_TOP, -0.22]} rotation={-0.6} />
+        <Prop name="metal_office_desk" width={1.6} position={[0, 0, 0]} />
+        <group ref={chair} position={[-0.42, 0, 0.72]}>
+          <Prop name="modern_arm_chair_01" height={0.95} position={[0, 0, 0]} />
+        </group>
+        <Prop name="desk_lamp_arm_01" height={0.5} position={[-0.68, DESK_TOP, -0.25]} rotation={0.6} />
       </Suspense>
-      {busy && <pointLight position={[0.45, DESK_TOP + 0.45, 0]} intensity={2.2} distance={2.2} color="#ffd9a0" />}
-      {/* monitor: the hotspot */}
-      <group position={[0, DESK_TOP, -0.2]} onClick={stop(onOpen)} {...pointer}>
-        <mesh position={[0, 0.1, 0]} castShadow><boxGeometry args={[0.05, 0.2, 0.05]} /><meshStandardMaterial color="#2a2b2d" metalness={0.6} roughness={0.35} /></mesh>
-        <mesh position={[0, 0.006, 0]} castShadow><boxGeometry args={[0.24, 0.012, 0.16]} /><meshStandardMaterial color="#2a2b2d" metalness={0.6} roughness={0.35} /></mesh>
-        <RoundedBox args={[0.72, 0.44, 0.035]} radius={0.012} position={[0, 0.42, 0]} castShadow><meshStandardMaterial color="#1f2022" metalness={0.4} roughness={0.35} /></RoundedBox>
-        <mesh position={[0, 0.42, 0.0185]}><planeGeometry args={[0.68, 0.4]} /><meshBasicMaterial map={screen} toneMapped={false} /></mesh>
-        <mesh position={[0, 0.42, 0.05]}><planeGeometry args={[0.8, 0.55]} /><meshBasicMaterial transparent opacity={0} depthWrite={false} /></mesh>
+      {/* the reporter: sits to one side so the screen stays readable from the room */}
+      <Person look={PEOPLE[role]} pose={pose} seated busy={busy} position={[-0.42, 0, 0.66]} rotation={Math.PI + 0.25} />
+      {busy && <pointLight position={[-0.5, DESK_TOP + 0.45, 0]} intensity={2.2} distance={2.2} color="#ffd9a0" />}
+      {/* a large monitor: the hotspot */}
+      <group position={[0.12, DESK_TOP, -0.22]} onClick={stop(onOpen)} {...pointer}>
+        <mesh position={[0, 0.13, 0]} castShadow><boxGeometry args={[0.06, 0.26, 0.06]} /><meshStandardMaterial color="#2a2b2d" metalness={0.6} roughness={0.35} /></mesh>
+        <mesh position={[0, 0.006, 0]} castShadow><boxGeometry args={[0.32, 0.012, 0.2]} /><meshStandardMaterial color="#2a2b2d" metalness={0.6} roughness={0.35} /></mesh>
+        <RoundedBox args={[1.12, 0.66, 0.04]} radius={0.014} position={[0, 0.6, 0]} castShadow><meshStandardMaterial color="#1f2022" metalness={0.4} roughness={0.35} /></RoundedBox>
+        <mesh position={[0, 0.6, 0.021]}><planeGeometry args={[1.07, 0.62]} /><meshBasicMaterial map={screen} toneMapped={false} /></mesh>
+        <mesh position={[0, 0.6, 0.06]}><planeGeometry args={[1.2, 0.75]} /><meshBasicMaterial transparent opacity={0} depthWrite={false} /></mesh>
       </group>
       {/* paper tray: one sheet per verified exhibit */}
-      <group position={[-0.5, DESK_TOP, 0.05]}>
+      <group position={[0.62, DESK_TOP, 0.12]}>
         <mesh position={[0, 0.006, 0]}><boxGeometry args={[0.3, 0.012, 0.36]} /><meshStandardMaterial color="#3a3a38" metalness={0.5} roughness={0.4} /></mesh>
         {Array.from({ length: Math.min(sheets, 10) }, (_, i) => <mesh key={i} position={[(i % 2) * 0.006, 0.014 + i * 0.004, 0]} rotation={[0, (i % 3 - 1) * 0.04, 0]} castShadow><boxGeometry args={[0.21, 0.003, 0.297]} /><meshStandardMaterial color="#f4efe2" roughness={0.9} /></mesh>)}
       </group>
-      <mesh position={[0.15, DESK_TOP + 0.03, 0.28]} rotation={[-0.35, 0, 0]}><planeGeometry args={[0.32, 0.06]} /><meshStandardMaterial map={plate} metalness={0.4} roughness={0.4} /></mesh>
+      {/* the desk's hanging sign */}
+      <group position={[SIGN_SHIFT[role], SIGN_Y[role], -0.25]}>
+        {[-0.45, 0.45].map((x) => <mesh key={x} position={[x, (3.4 - SIGN_Y[role]) / 2, 0]}><cylinderGeometry args={[0.004, 0.004, 3.4 - SIGN_Y[role]]} /><meshStandardMaterial color="#555" /></mesh>)}
+        <mesh castShadow><boxGeometry args={[1.1, 0.34, 0.02]} /><meshStandardMaterial color="#f7f1e3" /></mesh>
+        <mesh position={[0, 0, 0.011]}><planeGeometry args={[1.08, 0.32]} /><meshBasicMaterial map={sign} toneMapped={false} /></mesh>
+      </group>
       {speech && (
-        <Html position={[0, 1.85, 0]} center distanceFactor={4} zIndexRange={[30, 0]}>
-          <div className="pointer-events-none w-[220px] rounded-[12px] border-2 bg-[#fffaf0] px-3 py-2 text-[#2b241c] shadow-lg" style={{ borderColor: speech.tone }}>
-            <p className="typed text-[10px] uppercase tracking-wide" style={{ color: speech.tone }}>{look.name}</p>
-            <p className="hand text-[19px] leading-[1.05]">{speech.text}</p>
+        <Html position={[0, 2.05, 0]} center distanceFactor={4} zIndexRange={[30, 0]}>
+          <div className="pointer-events-none w-[260px] rounded-[12px] border-2 bg-[#fffaf0] px-3 py-2 text-[#2b241c] shadow-lg" style={{ borderColor: speech.tone }}>
+            <p className="typed text-[12px] uppercase tracking-wide" style={{ color: speech.tone }}>{look.name}</p>
+            <p className="hand text-[23px] leading-[1.05]">{speech.text}</p>
           </div>
         </Html>
       )}
@@ -438,7 +455,6 @@ function EvidenceBoard({ c, onFocus, onEvidence, onVerdict, focused }: { c: Case
         </group>
       )}
       {/* picture light over the board */}
-      <mesh position={[0, BOARD.h / 2 + 0.22, 0.12]} castShadow><boxGeometry args={[2.6, 0.06, 0.08]} /><meshStandardMaterial color="#b88a3e" metalness={0.8} roughness={0.3} /></mesh>
       <spotLight position={[0, BOARD.h / 2 + 0.3, 1.4]} target-position={[0, 0, 0]} angle={0.9} penumbra={0.8} intensity={6} distance={6} color="#fff0d8" />
     </group>
   );
@@ -449,7 +465,7 @@ function SourcePrints({ c, onSource }: { c: Case | null; onSource: (id: string) 
   const withImg = (c?.sources ?? []).filter((s) => s.image).slice(0, 2);
   return (
     <>
-      {withImg.map((s, i) => <Print key={s.id} url={s.image!.url} pos={[3.25 + i * 1.25, 1.95 - i * 0.35, -4.92]} onClick={() => onSource(s.id)} />)}
+      {withImg.map((s, i) => <Print key={s.id} url={s.image!.url} pos={[-5.6, 2.15 - i * 0.95, -4.92]} onClick={() => onSource(s.id)} />)}
     </>
   );
 }
@@ -460,6 +476,46 @@ function Print({ url, pos, onClick }: { url: string; pos: [number, number, numbe
     <group position={pos} onClick={stop(onClick)} {...pointer}>
       <mesh castShadow><boxGeometry args={[1.0, 0.76, 0.04]} /><meshStandardMaterial color="#1e1e1e" roughness={0.5} /></mesh>
       <mesh position={[0, 0, 0.021]}><planeGeometry args={[0.92, 0.69]} /><meshStandardMaterial map={tex} roughness={0.6} /></mesh>
+    </group>
+  );
+}
+
+/** The editor-in-chief (the Judge agent) at the table; at the wall when the case reaches the bench. A researcher works the shelves. */
+function People({ c }: { c: Case | null }) {
+  const bench = c?.phase === "deliberation" || c?.phase === "verdict";
+  return (
+    <>
+      {bench
+        ? <Person look={PEOPLE.judge} pose={c?.busy.judge ? "reading" : "pointing"} position={[2.25, 0, -4.05]} rotation={Math.PI - 0.35} />
+        : <Person look={PEOPLE.judge} pose="leaning" position={[0.15, 0, 2.15]} rotation={Math.PI} />}
+      <Person look={PEOPLE.researcher} pose="reading" position={[-5.75, 0, 0.25]} rotation={-Math.PI / 2 + 0.3} />
+    </>
+  );
+}
+
+/** The election desk's identity: sign over the board, live election screen, news ticker. */
+function DeskIdentity({ c }: { c: Case | null }) {
+  const sign = useCanvas(2048, 200, (g) => drawWallSign(g), []);
+  const rows = DOSSIERS.map((d) => ({ country: d.country, election: d.election, when: relativeDay(d.date), held: Date.parse(d.date) < Date.now() }));
+  const screen = useCanvas(1600, 900, (g) => drawElectionScreen(g, rows, c?.claim ?? null, c?.phase ?? null), [c?.claim, c?.phase]);
+  const items = [
+    ...DOSSIERS.map((d) => `${d.country.toUpperCase()}: ${d.election} · ${relativeDay(d.date)}`),
+    ...DOSSIERS.map((d) => `${d.context.at(-1)!.publisher}: “${d.context.at(-1)!.quote.split(" ").slice(0, 14).join(" ")}…”`),
+    ...(c ? c.activity.filter((a) => a.kind === "phase").slice(-3).map((a) => `DESK: ${a.text}`) : []),
+  ];
+  const ticker = useCanvas(4096, 128, (g) => drawTicker(g, items), [items.join("|")]);
+  ticker.wrapS = THREE.RepeatWrapping;
+  useFrame((_, dt) => { ticker.offset.x = (ticker.offset.x + dt * 0.035) % 1; });
+  return (
+    <group>
+      <mesh position={[-0.6, 3.12, ROOM.z0 + 0.08]}><planeGeometry args={[5.6, 0.55]} /><meshBasicMaterial map={sign} transparent toneMapped={false} /></mesh>
+      {/* the election screen, wall-mounted, with the ticker running under it */}
+      <group position={[4.45, 1.8, ROOM.z0 + 0.09]}>
+        <RoundedBox args={[2.4, 1.39, 0.06]} radius={0.015} castShadow><meshStandardMaterial color="#141414" metalness={0.4} roughness={0.3} /></RoundedBox>
+        <mesh position={[0, 0, 0.032]}><planeGeometry args={[2.32, 1.31]} /><meshBasicMaterial map={screen} toneMapped={false} /></mesh>
+      </group>
+      <mesh position={[-0.6, 0.36, ROOM.z0 + 0.09]}><boxGeometry args={[7.4, 0.2, 0.03]} /><meshStandardMaterial color="#111" /></mesh>
+      <mesh position={[-0.6, 0.36, ROOM.z0 + 0.106]}><planeGeometry args={[7.3, 0.16]} /><meshBasicMaterial map={ticker} toneMapped={false} /></mesh>
     </group>
   );
 }
@@ -508,6 +564,8 @@ export default function Newsroom3D({ c, now, focus, sheetOpen, onFocus, onPin, o
           <EvidenceBoard c={c} focused={focus === "wall"} onFocus={() => onFocus("wall")} onEvidence={onEvidence} onVerdict={onVerdict} />
           <SourcePrints c={c} onSource={onSource} />
           <ElectionPosters />
+          <DeskIdentity c={c} />
+          <People c={c} />
           <FlyingPapers c={c} now={now} />
         </Suspense>
         <Rig focus={focus} sheetOpen={sheetOpen} />

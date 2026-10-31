@@ -12,6 +12,10 @@ const stations = page.getByRole("navigation", { name: "Stations" });
 
 await page.goto("http://localhost:5173/", { waitUntil: "load" });
 await page.waitForTimeout(14000);
+await step("0 the opening screen", async () => {
+  await page.getByRole("dialog", { name: "The Ground Truth: Election Desk" }).waitFor(); await shot("00-intro");
+  await page.getByRole("button", { name: "Enter the newsroom" }).click(); await page.waitForTimeout(2500);
+});
 await step("1 enter the 3D newsroom", async () => { await stations.waitFor(); await shot("01-overview"); });
 await step("2 table → Serbia dossier", async () => {
   await stations.getByRole("button", { name: "Table", exact: true }).click();

@@ -40,7 +40,8 @@ export default function App() {
   useEffect(() => { health().then((h) => setLiveCourt(h ? h.live : false)); }, []);
 
   const live = useLiveCase(view.caseId);
-  const replay = useReplay(view.demo);
+  // ?speed=1 replays in real time (presenting); the default compresses a run 4×
+  const replay = useReplay(view.demo, Math.min(8, Math.max(0.5, Number(new URLSearchParams(location.search).get("speed")) || 4)));
   const c = view.caseId ? live.data : view.demo ? replay.data : null;
 
   const open = async (input: { claim?: string; url?: string }) => {
