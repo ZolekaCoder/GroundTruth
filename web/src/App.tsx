@@ -1,20 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { Masthead } from "./components/Masthead";
-import { Intake } from "./components/Intake";
-import { ElectionDesk } from "./components/ElectionDesk";
 import { Room } from "./components/Room";
 import { CaseOpened } from "./components/CaseOpened";
+import { Scene } from "./night/Scene";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useLiveCase, useReplay } from "./lib/useCase";
 import { health, objection, openCase } from "./lib/api";
 
-type View = { kind: "desk" } | { kind: "case"; id: string } | { kind: "demo" };
+type View = { caseId: string | null; demo: boolean; text: boolean };
 
 function readView(): View {
   const p = new URLSearchParams(location.search);
-  if (p.get("case")) return { kind: "case", id: p.get("case")! };
-  if (p.has("demo")) return { kind: "demo" };
-  return { kind: "desk" };
+  return { caseId: p.get("case"), demo: p.has("demo"), text: p.get("view") === "text" };
 }
 
 export default function App() {
@@ -22,31 +20,35 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [opening, setOpening] = useState<{ no: string; claim: string } | null>(null);
-  const [live, setLive] = useState<boolean | null>(null);
-  const [offlineReason, setOfflineReason] = useState<string | null>(null);
-  const [replayKey, setReplayKey] = useState(0);
-  const [draftUrl, setDraftUrl] = useState<{ url: string; n: number } | null>(null);
+  const [liveCourt, setLiveCourt] = useState<boolean | null>(null);
   const autostarted = useRef(false);
 
   const go = (v: View) => {
-    const q = v.kind === "case" ? `?case=${v.id}` : v.kind === "demo" ? "?demo" : "/";
-    history.pushState(null, "", q); setView(v); window.scrollTo({ top: 0 });
+    const p = new URLSearchParams();
+    if (v.caseId) p.set("case", v.caseId);
+    if (v.demo) p.set("demo", "");
+    if (v.text) p.set("view", "text");
+    history.pushState(null, "", p.toString() ? `?${p.toString().replace("demo=", "demo")}` : "/");
+    setView(v);
   };
   useEffect(() => { const f = () => setView(readView()); addEventListener("popstate", f); return () => removeEventListener("popstate", f); }, []);
-  useEffect(() => { health().then((h) => { setLive(h ? h.live : false); setOfflineReason(h ? h.providerError ?? (h.live ? null : "The server has no model key configured.") : "The court server is not running (npm run dev)."); }); }, []);
+  useEffect(() => { health().then((h) => setLiveCourt(h ? h.live : false)); }, []);
 
-  const liveCase = useLiveCase(view.kind === "case" ? view.id : null);
-  const replay = useReplay(view.kind === "demo");
+  const live = useLiveCase(view.caseId);
+  const replay = useReplay(view.demo);
+  const c = view.caseId ? live.data : view.demo ? replay.data : null;
 
   const open = async (input: { claim?: string; url?: string }) => {
     setBusy(true); setError(null);
     try {
-      const c = await openCase(input);
-      setOpening({ no: c.id.slice(0, 8).toUpperCase(), claim: c.claim });
+      const k = await openCase(input);
+      setOpening({ no: k.id.slice(0, 8).toUpperCase(), claim: k.claim });
       setTimeout(() => setOpening(null), 2200);
-      go({ kind: "case", id: c.id });
+      go({ caseId: k.id, demo: false, text: false });
+      return true;
     } catch (e) {
       setError((e as Error).message);
+      return false;
     } finally { setBusy(false); }
   };
 
@@ -54,37 +56,36 @@ export default function App() {
   useEffect(() => {
     const p = new URLSearchParams(location.search);
     const claim = p.get("claim");
-    if (claim && !autostarted.current && view.kind === "desk") { autostarted.current = true; open({ claim, url: p.get("url") || undefined }); }
+    if (claim && !autostarted.current) { autostarted.current = true; open({ claim, url: p.get("url") || undefined }); }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const demo = () => { setOpening({ no: "RECORDED", claim: "Replaying a real, saved investigation" }); setTimeout(() => setOpening(null), 1800); setReplayKey((k) => k + 1); go({ kind: "demo" }); };
+  const demo = () => {
+    setOpening({ no: "RECORDED", claim: "Replaying a real, saved investigation" });
+    setTimeout(() => setOpening(null), 1800);
+    go({ caseId: null, demo: true, text: false });
+    replay.restart();
+  };
+  const raise = async (a: string, u?: string) => { if (view.caseId) await objection(view.caseId, a, u); };
 
-  const c = view.kind === "case" ? liveCase.data : view.kind === "demo" ? replay.data : null;
-  const status = view.kind === "case" ? "Live court" : view.kind === "demo" ? "Recorded case" : live ? "Court in session" : live === false ? "Court offline" : "";
+  if (view.text && c) {
+    // Accessible, non-spatial view of the same case: same data, conventional layout.
+    return (
+      <div className="min-h-screen overflow-x-clip">
+        <Masthead onHome={() => go({ ...view, text: false })} right={view.demo ? "Recorded case · text view" : "Live court · text view"} />
+        <Room c={c} live={!!view.caseId} lost={live.lost} onRestart={view.demo ? replay.restart : undefined} onObjection={raise} />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen overflow-x-clip">
-      <Masthead onHome={() => go({ kind: "desk" })} right={status} />
+    <>
+      <ErrorBoundary key={view.caseId ?? (view.demo ? "demo" : "room")} onTextView={c ? () => { location.assign(`${location.search}${location.search ? "&" : "?"}view=text`); } : undefined}>
+      <Scene c={c} live={!!view.caseId} recorded={view.demo} busy={busy} error={error ?? (view.demo ? replay.error : null)} liveCourt={liveCourt}
+        onOpenCase={open} onDemo={demo} onObjection={raise}
+        onRestartReplay={view.demo ? replay.restart : undefined}
+        onTextView={() => go({ ...view, text: true })} />
+      </ErrorBoundary>
       <AnimatePresence>{opening && <CaseOpened caseNo={opening.no} claim={opening.claim} />}</AnimatePresence>
-      {view.kind === "desk" && (
-        <>
-          <ElectionDesk onInvestigate={open} onDraft={(url) => setDraftUrl({ url, n: Date.now() })} onDemo={demo} busy={busy} live={live} error={error} />
-          <Intake onOpen={open} onDemo={demo} busy={busy} error={error} live={live} offlineReason={offlineReason} draftUrl={draftUrl} />
-        </>
-      )}
-      {view.kind !== "desk" && !c && (
-        <div className="grid min-h-[50vh] place-items-center px-6 text-center" role="status">
-          {view.kind === "demo" && replay.error ? <p className="text-red">{replay.error}</p> : <p className="display text-[24px] italic text-mute animate-pulse">Retrieving the case file…</p>}
-        </div>
-      )}
-      {c && (
-        <Room key={view.kind === "demo" ? `demo-${replayKey}` : c.id} c={c} live={view.kind === "case"} lost={liveCase.lost}
-          onRestart={view.kind === "demo" ? replay.restart : undefined}
-          onObjection={async (a, u) => { if (view.kind === "case") await objection(view.id, a, u); }} />
-      )}
-      <footer className="border-t border-rule px-4 py-6 text-center kicker text-mute sm:px-8">
-        The Ground Truth · Agreement between machines is not proof. Sources are.
-      </footer>
-    </div>
+    </>
   );
 }

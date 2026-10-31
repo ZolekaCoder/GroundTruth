@@ -11,8 +11,19 @@
   --color-gold: #c4a265;
   --color-red: #c2392f;
   --color-sage: #93a37f;
-  --font-serif: "Fraunces", Georgia, serif;
-  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  /* Night Shift materials */
+  --color-walnut: #3a2619;
+  --color-walnut-lit: #6b452a;
+  --color-graphite: #24221f;
+  --color-bronze: #8c6b43;
+  --color-limestone: #c9bfa9;
+  --color-olive: #6d7046;
+  --color-tobacco: #5a3d27;
+  --color-paper: #ece2c8;
+  --color-paper-ink: #2b241c;
+  --color-alarm: #a3302a;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
@@ -46,3 +57,44 @@ body::before {
 @keyframes gt-dash { to { stroke-dashoffset: -14; } }
 .gt-ping { animation: gt-ping 1.8s ease-out infinite; transform-origin: center; transform-box: fill-box; }
 @keyframes gt-ping { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(3); } }
+
+/* ---------- Night Shift materials ---------- */
+.mat-paper {
+  background-color: #ece2c8;
+  background-image:
+    radial-gradient(120% 90% at 30% 20%, rgba(255,250,235,.55), rgba(255,250,235,0) 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .27 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  color: var(--color-paper-ink);
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 2px 2px rgba(20,12,6,.35), 0 12px 24px -8px rgba(20,12,6,.55);
+}
+.mat-paper-aged { filter: sepia(.18) saturate(.95); }
+.mat-cork {
+  background-color: #6a4a30;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .11 0 0 0 0 .05 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.05' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .45 0 0 0 0 .3 0 0 0 .25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23d)'/%3E%3C/svg%3E");
+}
+.mat-walnut {
+  background-color: #3a2619;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='120'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.004 .18' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .34 0 0 0 0 .2 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+  background-size: 600px 120px;
+}
+.mat-plaster {
+  background-color: #3b3730;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='4'/%3E%3CfeColorMatrix values='0 0 0 0 .78 0 0 0 0 .72 0 0 0 0 .6 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+.typed { font-family: var(--font-mono); letter-spacing: -.01em; }
+.hint { font-family: var(--font-sans); font-size: 12.5px; letter-spacing: .01em; }
+
+/* camera + lens */
+.world { transform-origin: 0 0; transition: transform 1.4s cubic-bezier(.65,.02,.2,1); will-change: transform; }
+.station { transition: filter .9s ease, opacity .9s ease; }
+.world[data-focus]:not([data-focus="overview"]) .station:not([data-active]) { filter: blur(1.6px) brightness(.55) saturate(.8); }
+@media (prefers-reduced-motion: reduce) { .world { transition: none; } }
+
+.lamp-on { animation: lamp-flicker 3.2s ease-in-out infinite; }
+@keyframes lamp-flicker { 0%,100% { opacity: 1 } 47% { opacity: .93 } 50% { opacity: .98 } }
+.screen-scan { background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); }
+.caret::after { content: "▌"; animation: blink 1s steps(1) infinite; margin-left: 2px; }
+@keyframes blink { 50% { opacity: 0 } }

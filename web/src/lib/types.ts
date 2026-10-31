@@ -32,3 +32,6 @@ export const STANCE_META: Record<Stance, { label: string; color: string; gloss: 
   misleading: { label: "Misleading", color: "var(--color-gold)", gloss: "Partly true, but missing context distorts it." },
   insufficient: { label: "Insufficient evidence", color: "var(--color-mute)", gloss: "The available record cannot settle it." },
 };
+
+/** Tolerant lookup: an unexpected stance from the model must never crash the room. */
+export const stanceMeta = (s: string) => STANCE_META[s as Stance] ?? STANCE_META.insufficient;

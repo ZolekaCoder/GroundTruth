@@ -1,0 +1,25 @@
+// Live test: open the US dossier in the room and put its synthetic claim on trial for real (Mozaik + model).
+import { chromium } from "playwright";
+const browser = await chromium.launch({ channel: "chrome", headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const errors = [];
+page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+page.on("pageerror", (e) => errors.push(String(e)));
+await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
+await page.waitForTimeout(1200);
+await page.getByRole("button", { name: /Open the United States dossier/ }).click({ force: true });
+await page.getByRole("button", { name: "Put it on trial" }).click();
+await page.waitForURL(/case=/, { timeout: 30000 });
+console.log("case url", page.url());
+await page.waitForTimeout(12000);
+await page.screenshot({ path: "artifacts/visual-qa/07-live-agents-working-1440.png" });
+const busy = await page.locator("text=● WORKING").count();
+console.log("monitors showing WORKING at t+12s:", busy);
+await page.getByRole("button", { name: /RULING OF THE COURT/i }).waitFor({ timeout: 240000 });
+await page.waitForTimeout(3000);
+await page.screenshot({ path: "artifacts/visual-qa/07-live-wall-verdict-1440.png" });
+await page.getByRole("button", { name: /RULING OF THE COURT/i }).click();
+await page.waitForTimeout(1500);
+await page.screenshot({ path: "artifacts/visual-qa/07-live-verdict-1440.png" });
+console.log(JSON.stringify({ errors }));
+await browser.close();

@@ -51,5 +51,5 @@ export function useReplay(enabled: boolean, speed = 4) {
       sources: record.sources.filter((s) => s.retrievedAt <= t),
     } as Case;
   }, [record, t]);
-  return { data, error, restart: () => (start.current = performance.now()) };
+  return { data, error, restart: () => { start.current = performance.now(); if (record) setT(record.openedAt); } };
 }

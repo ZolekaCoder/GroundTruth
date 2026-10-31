@@ -10,6 +10,20 @@ export const VERDICT_EVENT = "court.verdict";
 
 const STANCES: Stance[] = ["supported", "contradicted", "misleading", "insufficient"];
 
+// Tool-schema enums are advisory for some providers (the model has sent "contradicts" for
+// "undermines"), so every enum is normalised or rejected here, server-side.
+const BEARING_ALIASES: Record<string, Bearing> = {
+  supports: "supports", support: "supports", confirms: "supports", supporting: "supports",
+  undermines: "undermines", contradicts: "undermines", refutes: "undermines", contradicting: "undermines", undermining: "undermines",
+  context: "context", qualifies: "context", contextual: "context", qualifying: "context",
+};
+const STANCE_ALIASES: Record<string, Stance> = {
+  supported: "supported", true: "supported", contradicted: "contradicted", false: "contradicted",
+  misleading: "misleading", "missing context": "misleading", insufficient: "insufficient", "insufficient evidence": "insufficient", unverifiable: "insufficient",
+};
+const asBearing = (v: unknown) => BEARING_ALIASES[String(v).toLowerCase().trim()];
+const asStance = (v: unknown) => STANCE_ALIASES[String(v).toLowerCase().trim()];
+
 function fn(name: string, description: string, properties: Record<string, any>, invoke: (args: any) => Promise<string>): Tool {
   return {
     type: "function",
@@ -53,8 +67,10 @@ function researchTools(caseId: string, role: Role, agentId: () => string): Tool[
         bearing: { type: "string", enum: ["supports", "undermines", "context"], description: "How this bears on the claim" },
         relevance: { type: "string", description: "One sentence: why this matters to the claim" },
       },
-      async ({ url, quote, bearing, relevance }) => {
+      async ({ url, quote, bearing: rawBearing, relevance }) => {
         const k = c();
+        const bearing = asBearing(rawBearing);
+        if (!bearing) return 'Rejected: bearing must be exactly "supports", "undermines" or "context".';
         const source = k.sources.find((s) => s.url === url);
         if (!source) return "Rejected: you have not opened that URL with read_source in this case.";
         if (!quoteIsGrounded(source, quote)) return "Rejected: that quote does not appear verbatim in the source. Copy the exact wording.";
@@ -97,8 +113,10 @@ export function advocateTools(caseId: string, role: Advocate, agentId: () => str
         evidence_ids: { type: "array", items: { type: "string" } },
         what_changed: { type: "string", description: "If your stance or confidence moved since your last filing, what evidence moved it. Empty string on first filing or if unchanged." },
       },
-      async ({ stance, confidence, argument, evidence_ids, what_changed }) => {
+      async ({ stance: rawStance, confidence, argument, evidence_ids, what_changed }) => {
         const k = c();
+        const stance = asStance(rawStance);
+        if (!stance) return `Rejected: stance must be one of ${STANCES.join(", ")}.`;
         if (k.filings.some((f) => f.role === role && f.round === k.round)) return "You already filed this round.";
         const prev = [...k.filings].reverse().find((f) => f.role === role);
         const filing: Filing = {
@@ -132,13 +150,15 @@ export function judgeTools(caseId: string, agentId: () => string): Tool[] {
       async (a) => {
         const k = c();
         if (k.verdicts.some((v) => v.round === k.round)) return "Verdict already delivered.";
+        const verdict = asStance(a.verdict);
+        if (!verdict) return `Rejected: verdict must be one of ${STANCES.join(", ")}.`;
         const v: Verdict = {
-          round: k.round, verdict: a.verdict, confidence: Math.max(0, Math.min(100, a.confidence)), headline: a.headline,
+          round: k.round, verdict, confidence: Math.max(0, Math.min(100, a.confidence)), headline: a.headline,
           summary: a.summary, reasoning: a.reasoning, uncertainties: a.uncertainties, framingNotes: a.framing_notes ?? [], at: Date.now(),
           keyEvidenceIds: a.key_evidence_ids.filter((id: string) => k.evidence.some((e) => e.id === id)),
         };
         k.verdicts.push(v);
-        log(k, "judge", "said", `Verdict: ${a.verdict.toUpperCase()}`);
+        log(k, "judge", "said", `Verdict: ${verdict.toUpperCase()}`);
         sendEvent(SemanticEvent.create(VERDICT_EVENT, agentId(), { caseId, round: k.round }), agentId());
         return "Verdict delivered. Reply with one short sentence and stop.";
       }),

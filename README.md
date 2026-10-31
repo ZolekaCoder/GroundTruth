@@ -21,9 +21,22 @@ Most election misinformation is not invented from nothing. It is a real sentence
 - **Fact vs framing:** challenges are tagged as *factual* (is it true?) or *framing* (what was selected, emphasised or left out). The Judge lists framing problems separately from factual findings.
 - **No consensus-as-proof:** agreement between agents never counts as evidence.
 
+## The experience: the Night Shift
+
+You are an investigative editor walking into a newsroom at night. There are no pages. The camera moves between stations in one room (see [`DESIGN.md`](DESIGN.md)):
+
+| Station | Where | What you do |
+|---|---|---|
+| **Election table** | The lit walnut table, with a map laid flat | Choose a brass pin (Serbia, United States, South Africa) and the camera moves in on that country's dossier: date, context quoted verbatim from primary sources, the sources, and a test claim you can put on trial |
+| **Case desk** | The manila folder | Open your own case on a typed intake sheet, or read the open case's file |
+| **The investigators** | Three workstations | Each monitor shows that agent's live Mozaik activity, its banker's lamp is lit only while its loop is running, and its paper tray grows with every quote it gets verified. Click a monitor to read the agent's file: positions by round, reasoning (labelled *not evidence*), challenges and its research trail |
+| **Evidence wall** | The cork board at the back | Exhibits fly in from the desk that entered them. Strings are coloured by bearing (red only for contradictions), disagreements arc between advocate tags, sources and positions sit on the wings, and the ruling is pinned when it's delivered. Open any document, stamp the ruling, save it, or reopen it with an objection |
+
+`Esc` or **Back to the room** always returns to the overview without losing the case. A **text view** of every case is one click away, for accessibility and as a non-spatial fallback. Narrow screens get a small station strip. Reduced-motion users get instant camera cuts and no parallax. Visual QA (screenshots, critique and scores) is in [`VISUAL_QA.md`](VISUAL_QA.md).
+
 ## How it works
 
-The **Election Desk** opens on an interactive globe. Serbia, the United States and South Africa each open a dossier containing the election date, context quoted verbatim from primary sources, the sources themselves, and a test claim you can put on trial. From there you enter the **newsroom**: paste any claim, attach the article it came from, or arrive from the Chrome extension.
+Pick an election on the table map, or paste any claim into the case folder, or arrive from the Chrome extension.
 
 Three Mozaik agents then investigate the claim **at the same time**:
 
@@ -95,7 +108,16 @@ npm install
 npm run dev                   # server :8787 + web :5173
 ```
 
-Open http://localhost:5173.
+Open http://localhost:5173 and you're standing in the newsroom.
+
+**Visual QA and journey tests** (Playwright driving your installed Chrome; no browser download):
+
+```bash
+node scripts/flows.mjs 1440 900 check     # the seven journeys on the recorded case → artifacts/visual-qa/
+node scripts/shoot.mjs name / 1440 900    # one screenshot + console errors
+node scripts/live-flow.mjs                # a real live case through the room (uses the model key)
+npm run check-evidence                    # quote verification against a real source, no model
+```
 
 **Re-record the flagship Serbia case** (needs a funded key, about 1–2 minutes):
 
@@ -117,7 +139,7 @@ The extension holds no keys. It only passes the selected text and the page URL t
 
 ```
 server/   Mozaik runtime, agents, tools, Clerk, Express + SSE
-web/      React + TypeScript + Tailwind v4 + Motion + React Flow
+web/      React + TypeScript + Tailwind v4 + Motion; src/night/ is the spatial newsroom
 extension/ Chrome MV3 extension
 docs/     submission text and demo script
 ```
@@ -127,6 +149,8 @@ docs/     submission text and demo script
 - **Live:** Election Desk with globe and three source-quoted dossiers, concurrent investigation, verified evidence ledger, cross-examination with factual/framing challenges and revisions, judge verdict with framing notes and uncertainty, Objection! re-trial, evidence board, shareable summary, extension.
 - **Labelled:** dossier test claims are marked *Synthetic test claim* everywhere they appear, including inside the courtroom. The replay is marked *Recorded investigation*. The calibration docket uses non-political myths.
 - **Every dossier quote** was checked with the court's own verbatim verifier against the retrieved page. One summariser-supplied "quote" failed that check and was removed. `elections.org.za` redirected to a third-party domain when checked, so the dossier cites the government statement for IEC facts.
+- **Enum hardening:** tool-schema enums aren't enforced by every provider (the model once sent `"contradicts"`), so bearings, stances and verdicts are normalised or rejected server-side, and the room tolerates unknown values.
+- **Cases are in memory:** restarting the server clears live cases, while the bundled recording is unaffected.
 - **Reliability:** if a Mozaik loop dies silently (the model returns an empty reply and the loop throws `No transition rule found after "inference"`), the Clerk detects 20s of silence and re-summons that agent, at most twice. Orphaned turns are closed when the round is decided.
 - **Not built:** *Same Story, Different Spin*, the side-by-side article comparison. It was deprioritised in favour of the Investigation Room.
 - Search uses the Wikipedia API (reliable, keyless). Agents can read any article URL, but script-rendered or paywalled pages are reported as unreadable rather than guessed at.

@@ -16,6 +16,7 @@
     "check-evidence": "npm run check-evidence -w server"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "playwright": "^1.49.1"
   }
 }
