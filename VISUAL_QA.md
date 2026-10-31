@@ -197,3 +197,32 @@ Every shot used the recording or the empty room. **No API calls were made.**
 - **Are the agent desks prominent?** Yes: large monitors and named hanging signs with live status.
 
 **Still true:** the people are stylised, faceless figures, not realistic characters, and there is no post-processing.
+
+
+---
+
+# Revision 5: cinematic opening, clean-up, final live run
+
+**Impeccable** (`npx impeccable detect`, v4.8.0, 62 rules) was used as the critic. Its skill pack wasn't installed, so the detector was the tool.
+
+| Step | Findings | Change |
+|---|---|---|
+| Baseline scan of the old opening | 4 findings: overused font (Instrument Sans), a marquee (auto-scrolling HTML ticker), low-contrast "2D view" link, low-contrast hint pill | — |
+| Redesign | — | The hero is now the room itself: a broadcast cold open on the live election board, with letterbox, LIVE bug, real time and a lower third, then a slow camera dolly into the room. The HTML marquee, the "Court in session" chip, the floating "2D view" and "Text view" links (moved into the dock), the 3D hint pill and the redundant desk nameplates were removed. The interface font is now IBM Plex Sans Condensed. |
+| `40-coldopen` | The lower third collided with the board text | Reframed so the board sits high and right; compact lower third (`41`) |
+| `41-coldopen` | A gold date line wrapped into the board and duplicated it | Removed (`43-coldopen-final`) |
+| Rescan, opening | **0 findings (exit 0)** | — |
+| Rescan, `?demo` | 9 findings in the editor's memo: tight handwritten leading, long lines, 11px labels, low-contrast disabled buttons, a stripe gradient (advisory) | Leading 1.25+, max line widths, labels at least 12.5px, assignment controls hidden in recordings, plain paper |
+| Rescan, `?demo` | **0 findings (exit 0)** | — |
+| Regression | 3D journeys **11/11**, 2D fallback **11/11**, 0 console errors | — |
+
+## The final run used the live API
+
+`node scripts/live-final.mjs` drove a **live** case through the cold open and the 3D room, with the editor's decisions made in the memo by the test, standing in for a person (not by the server autopilot). Screenshots use Chrome DevTools Protocol capture, because Playwright's screenshot waits for fonts to settle, which never happens while live updates redraw canvas textures under software WebGL. The first attempt stopped there, and the same live case was resumed, so no credits were wasted.
+
+- **Stages:** investigation, decision, leads, cross-examination, rebuttal, decision, deliberation, verdict
+- **Decision 1:** L1 assigned to the Investigator and L2 to the Prosecutor, researched concurrently; both reported
+- **Rebuttal:** 5 challenges, 3 conceded and 2 rebutted
+- **Verdict:** **Misleading (76%)**, "Observers praised turnout but assessment was deliberately mixed, not positive", from 9 verified exhibits
+- **Concurrency:** peak of 3 agent turns at once; 0 browser errors
+- **Frames:** `50-live-*`

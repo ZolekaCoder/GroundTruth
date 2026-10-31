@@ -23,6 +23,8 @@ function deskShot(r: Advocate): Shot {
   return { pos: at(0.75, 1.8, 2.35), target: at(0.12, 1.3, -0.22) };
 }
 const PRESETS: Record<Focus, Shot> = {
+  // the cold open: tight on the live election board, the sign and wall at the edge of frame
+  intro: { pos: [1.55, 1.35, -1.25], target: [3.75, 1.95, -4.9] },
   overview: { pos: [0.6, 2.55, 8.2], target: [0.1, 0.95, -0.9] },
   table: { pos: [0.3, 2.35, 3.2], target: [0, 0.76, 1.15] },
   desk: { pos: [1.55, 1.75, 2.75], target: [0.85, 0.78, 1.45] },
@@ -41,7 +43,11 @@ function Rig({ focus, sheetOpen }: { focus: Focus; sheetOpen: boolean }) {
     c.setBoundary(new THREE.Box3(V(-6.6, 0.35, -4.7), V(6.6, 3.2, 8.7)));
     c.boundaryEnclosesCamera = true;
   }, []);
+  const prev = useRef<Focus>(focus);
   useEffect(() => {
+    // leaving the cold open is a long, slow dolly back into the room; everything else is brisk
+    if (ref.current) ref.current.smoothTime = prev.current === "intro" ? 1.9 : 0.85;
+    prev.current = focus;
     const p = PRESETS[focus];
     const pos = V(...p.pos), tgt = V(...p.target);
     // a document sliding in on the right: shift the shot so the station sits in the left half
@@ -51,7 +57,7 @@ function Rig({ focus, sheetOpen }: { focus: Focus; sheetOpen: boolean }) {
       const d = pos.distanceTo(tgt) * 0.36;
       pos.addScaledVector(right, d); tgt.addScaledVector(right, d);
     }
-    ref.current?.setLookAt(pos.x, pos.y, pos.z, tgt.x, tgt.y, tgt.z, true);
+    ref.current?.setLookAt(pos.x, pos.y, pos.z, tgt.x, tgt.y, tgt.z, focus !== "intro");
   }, [focus, sheetOpen, size.width]);
   return <CameraControls ref={ref} makeDefault smoothTime={0.85} minDistance={0.5} maxDistance={9} minPolarAngle={0.35} maxPolarAngle={1.75} dollySpeed={0.4} truckSpeed={0} />;
 }
@@ -552,7 +558,7 @@ export default function Newsroom3D({ c, now, focus, sheetOpen, onFocus, onPin, o
 }) {
   return (
     <div className="absolute inset-0 isolate bg-[#dfe7ec]">
-      <Canvas shadows dpr={[1, 1.75]} camera={{ position: PRESETS.overview.pos, fov: 48, near: 0.05, far: 200 }} gl={{ antialias: true, preserveDrawingBuffer: true, toneMappingExposure: 1.15 }}>
+      <Canvas shadows dpr={[1, 1.75]} camera={{ position: (focus === "intro" ? PRESETS.intro : PRESETS.overview).pos, fov: 48, near: 0.05, far: 200 }} gl={{ antialias: true, preserveDrawingBuffer: true, toneMappingExposure: 1.15 }}>
         <Suspense fallback={null}>
           <Environment files={`${A}/hdri/canary_wharf_2k.hdr`} background environmentIntensity={0.6} backgroundIntensity={1.15} backgroundRotation={[0, HDRI_ROT, 0]} environmentRotation={[0, HDRI_ROT, 0]} />
           <Lights />

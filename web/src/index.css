@@ -12,7 +12,7 @@
   --color-red: #c2392f;
   --color-sage: #93a37f;
   --font-serif: "Newsreader", Georgia, serif;
-  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans Condensed", system-ui, sans-serif;
   /* Night Shift materials */
   --color-walnut: #3a2619;
   --color-walnut-lit: #6b452a;
@@ -140,3 +140,7 @@ body::before {
 .breaking-dot { animation: breaking-pulse 1.2s ease-in-out infinite; }
 @keyframes ticker-scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 .ticker-run { animation: ticker-scroll 40s linear infinite; }
+
+/* broadcast cold open */
+@keyframes rec-blink { 0%,100% { opacity: 1 } 50% { opacity: .25 } }
+.rec { animation: rec-blink 1.6s steps(2) infinite; }

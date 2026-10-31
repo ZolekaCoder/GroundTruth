@@ -358,10 +358,10 @@ export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
 
   return (
     <Sheet onClose={onClose} label="Editor's decision" width={720} tilt={0.5}>
-      <div className="p-7" style={{ backgroundImage: "repeating-linear-gradient(transparent 0 29px, rgba(80,110,160,.18) 29px 30px)" }}>
-        <p className="typed text-[11px] text-[#a3302a]">EDITOR’S DESK · DECISION {afterInvestigation ? "1 OF 2" : "2 OF 2"}</p>
+      <div className="p-7">
+        <p className="typed text-[13px] text-[#a3302a]">EDITOR’S DESK · DECISION {afterInvestigation ? "1 OF 2" : "2 OF 2"}</p>
         <h2 className="hand mt-1 text-[38px] leading-none text-[#2b241c]">Your call, editor.</h2>
-        <p className="mt-2 max-w-[56ch] text-[14.5px] text-[#3d3222]">
+        <p className="mt-2 max-w-[60ch] text-[15.5px] leading-snug text-[#3d3222]">
           {afterInvestigation
             ? `First reports are in: ${c.evidence.length} verified exhibits. The desks flagged ${open.length} lead${open.length === 1 ? "" : "s"}. Choose what to chase and who chases it: leads you assign to different desks are researched at the same time.`
             : `Cross-examination is done: ${chal} challenge${chal === 1 ? "" : "s"}, ${conceded} conceded. Send it to the judge, or send someone back out first.`}
@@ -369,9 +369,9 @@ export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
 
         {recorded && (
           <div className="mt-4 bg-white/60 p-4" style={{ boxShadow: "0 2px 6px rgba(60,40,20,.15)" }}>
-            <p className="typed text-[11px] text-[#8a5a1e]">RECORDED DECISION{c.autopilot ? " · TAKEN BY THE TEST AUTOPILOT, NOT A PERSON" : ""}</p>
+            <p className="typed text-[12.5px] text-[#7a4e16]">RECORDED DECISION{c.autopilot ? " · TAKEN BY THE TEST AUTOPILOT, NOT A PERSON" : ""}</p>
             <p className="mt-1 text-[14.5px]">{c.decisions.find((d) => d.at >= pauseAt)?.detail ?? "Continue to see what was decided."}</p>
-            <p className="mt-1 text-[12.5px] text-[#6b5a3c]">A recording can only follow the path that was actually taken. Open a live case to make this call yourself.</p>
+            <p className="mt-1 max-w-[68ch] text-[14px] text-[#4a3d2a]">A recording can only follow the path that was actually taken. Open a live case to make this call yourself.</p>
             <button onClick={onContinue} className="mt-3 bg-[#2b241c] px-5 py-2.5 text-[14px] font-semibold text-paper hover:bg-[#2f5f63]">Continue the recording</button>
           </div>
         )}
@@ -380,21 +380,21 @@ export function EditorMemo({ c, live, onDecide, onContinue, onClose }: {
           <ul className="mt-5 space-y-3">
             {open.map((l) => (
               <li key={l.id} className="p-3" style={{ background: "linear-gradient(#f6e7a6,#f1dd8c)", boxShadow: "0 3px 8px rgba(60,40,20,.2)" }}>
-                <p className="typed text-[10.5px] text-[#6b5a3c]">{l.id} · RAISED BY THE {l.by.toUpperCase()}</p>
-                <p className="hand text-[21px] leading-[1.05]">{l.question}</p>
-                <p className="mt-1 line-clamp-2 text-[12px] text-[#5a4a32]">{l.why}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="typed text-[11px] text-[#6b5a3c]">Assign to</span>
+                <p className="typed text-[12.5px] text-[#5a4a32]">{l.id} · RAISED BY THE {l.by.toUpperCase()}</p>
+                <p className="hand max-w-[52ch] text-[23px] leading-[1.25]">{l.question}</p>
+                <p className="mt-1 line-clamp-2 max-w-[68ch] text-[14px] leading-snug text-[#4a3d2a]">{l.why}</p>
+                {!recorded && <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="typed text-[12.5px] text-[#5a4a32]">Assign to</span>
                   {DESKS.map((d) => (
                     <button key={d.role} disabled={recorded} onClick={() => setAssign((a) => ({ ...a, [l.id]: a[l.id] === d.role ? undefined : d.role }))}
-                      className={`rounded-full border px-2.5 py-0.5 text-[12.5px] disabled:opacity-50 ${assign[l.id] === d.role ? "border-[#2f5f63] bg-[#2f5f63] text-white" : "border-[#8a7a5c] hover:bg-white/50"}`}>{d.label}</button>
+                      className={`rounded-full border px-3 py-1 text-[14px] ${assign[l.id] === d.role ? "border-[#2f5f63] bg-[#2f5f63] text-white" : "border-[#8a7a5c] hover:bg-white/50"}`}>{d.label}</button>
                   ))}
-                </div>
+                </div>}
               </li>
             ))}
             {!recorded && (
               <li className="bg-white/50 p-3">
-                <label className="typed text-[10.5px] text-[#6b5a3c]" htmlFor="own-lead">OR WRITE YOUR OWN LEAD</label>
+                <label className="typed text-[12.5px] text-[#5a4a32]" htmlFor="own-lead">OR WRITE YOUR OWN LEAD</label>
                 <input id="own-lead" value={own} onChange={(e) => setOwn(e.target.value)} placeholder="e.g. What did the final ODIHR report conclude?" className="hand mt-1 w-full border-b border-[#8a7a5c] bg-transparent text-[22px] focus:outline-none" />
                 <div className="mt-2 flex flex-wrap gap-1.5">{DESKS.map((d) => <button key={d.role} onClick={() => setOwnTo(d.role)} className={`rounded-full border px-2.5 py-0.5 text-[12.5px] ${ownTo === d.role ? "border-[#2f5f63] bg-[#2f5f63] text-white" : "border-[#8a7a5c]"}`}>{d.label}</button>)}</div>
               </li>

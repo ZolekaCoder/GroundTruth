@@ -14,10 +14,11 @@ import { EvidenceWall } from "./EvidenceWall";
 const Newsroom3D = lazy(() => import("../room3d/Newsroom3D"));
 import { AgentFile, CaseSheet, DossierFolder, EditorMemo, EvidenceSheet, SourceSheet, VerdictSheet } from "./Papers";
 
-export type Focus = "overview" | "table" | "desk" | "wall" | Advocate;
+export type Focus = "intro" | "overview" | "table" | "desk" | "wall" | Advocate;
 type Overlay = null | { kind: "editor" } | { kind: "dossier"; id: Dossier["id"] } | { kind: "case" } | { kind: "agent"; role: Advocate } | { kind: "evidence"; id: string } | { kind: "source"; id: string } | { kind: "verdict" };
 
 const CAMERA: Record<Focus, { cx: number; cy: number; z: number; label: string }> = {
+  intro: { cx: 800, cy: 450, z: 1, label: "Live" },
   overview: { cx: 800, cy: 450, z: 1, label: "The newsroom" },
   table: { cx: 810, cy: 640, z: 2.1, label: "The election table" },
   desk: { cx: 1090, cy: 665, z: 2.6, label: "The case desk" },
@@ -36,7 +37,9 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
   onOpenCase: (input: { claim?: string; url?: string }) => Promise<boolean>; onDemo: () => void;
   onObjection: (arg: string, url?: string) => Promise<void>; onRestartReplay?: () => void; onTextView?: () => void;
 }) {
-  const [focus, setFocus] = useState<Focus>("overview");
+  const [focus, setFocus] = useState<Focus>(() => {
+    try { return mode === "3d" && !c && !recorded && !sessionStorage.getItem("gt-intro-seen") ? "intro" : "overview"; } catch { return "overview"; }
+  });
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [vp, setVp] = useState({ w: innerWidth, h: innerHeight });
   const [px, setPx] = useState({ x: 0, y: 0 });
@@ -44,7 +47,7 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
   const verdictCount = useRef(c?.verdicts.length ?? 0);
   // the opening: shown on arrival at the empty newsroom, once per session
   const [intro, setIntro] = useState(() => { try { return !c && !recorded && !sessionStorage.getItem("gt-intro-seen"); } catch { return !c && !recorded; } });
-  const closeIntro = () => { setIntro(false); try { sessionStorage.setItem("gt-intro-seen", "1"); } catch { /* private mode */ } };
+  const closeIntro = () => { setIntro(false); setFocus("overview"); try { sessionStorage.setItem("gt-intro-seen", "1"); } catch { /* private mode */ } };
   // the room's clock: real time for a live case, the replay's own clock for a recording
   const [tick, setTick] = useState(Date.now());
   useEffect(() => { if (!live) return; const iv = setInterval(() => setTick(Date.now()), 400); return () => clearInterval(iv); }, [live]);
@@ -169,7 +172,7 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
       </>
       )}
       {/* HUD: small, at the edges */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 sm:p-5">
+      <header className={`pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 transition-opacity duration-700 sm:p-5 ${intro && !c ? "opacity-0" : "opacity-100"}`}>
         <div className="pointer-events-auto">
           <div className="inline-block bg-[#1b1611]/85 px-3 py-2" style={{ boxShadow: "0 4px 12px rgba(0,0,0,.25)" }}>
             <p className="whitespace-nowrap font-serif text-[20px] font-semibold leading-none text-paper sm:text-[24px]">The Ground Truth</p>
@@ -194,11 +197,10 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
               Live case · {c.phase === "awaiting_editor" ? "waiting for your decision" : c.phase.replace("_", "-")}{working ? ` · ${working} agents working` : ""}
             </div>
           ) : (
-            <div className="hint rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper/80">{liveCourt === false ? "Court offline · recordings only" : "Court in session"}</div>
+            liveCourt === false ? <div className="hint rounded-full bg-[#1b1611]/85 px-3 py-1.5 text-paper">Live court offline · recordings only</div> : null
           )}
           {synthetic && <div className="hint bg-[#1b1611]/85 px-3 py-1 text-[#e6c48f]">Synthetic test claim<span className="hidden sm:inline"> ({synthetic.country} dossier), not attributed to anyone</span></div>}
-          <a href={(() => { const p = new URLSearchParams(location.search); if (mode === "3d") p.set("view", "2d"); else p.delete("view"); const q = p.toString().replace("demo=", "demo"); return q ? `?${q}` : "/"; })()} className="hint hidden text-paper/80 underline-offset-2 hover:underline sm:inline">{mode === "3d" ? "2D view" : "3D view"}</a>
-          {c && onTextView && <button onClick={onTextView} className="hint hidden sm:inline-flex items-center gap-1.5 text-paper/70 underline-offset-2 hover:text-paper hover:underline"><FileText size={13} /> Text view of this case</button>}
+          {mode === "2d" && <a href={(() => { const p = new URLSearchParams(location.search); p.delete("view"); const q = p.toString().replace("demo=", "demo"); return q ? `?${q}` : "/"; })()} className="hint hidden rounded-full bg-[#1b1611]/85 px-3 py-1 text-paper hover:underline sm:inline">3D view</a>}
         </div>
       </header>
 
@@ -213,18 +215,25 @@ export function Scene({ mode = "2d", c, live, recorded, busy, error, liveCourt, 
       {!overlay && c?.phase === "awaiting_editor" && (
         <button onClick={() => { setFocus("wall"); setOverlay({ kind: "editor" }); }} className="hint absolute bottom-24 left-1/2 -translate-x-1/2 rounded-full bg-[#a3302a] px-4 py-2 text-white shadow-lg">Your call, editor: open the memo</button>
       )}
-      {!overlay && (
+      {!overlay && mode === "2d" && (
         <p className="hint pointer-events-none absolute bottom-4 left-1/2 w-max max-w-[92vw] -translate-x-1/2 rounded-full bg-[#1b1611]/60 px-3 py-1 text-center text-paper/90">
           {c?.phase === "awaiting_editor" ? "The desks are waiting on you" : focus === "overview" ? "Click the map, the case folder, a monitor or the wall" : focus === "wall" ? "Open any pinned document · the ruling appears here when it's ready" : focus === "table" ? "Choose a brass pin to open that election’s dossier" : "Esc returns to the room"}
         </p>
       )}
 
       {/* narrow screens can't show the whole room, so the stations get a small strip */}
-      {(vp.w < 700 || mode === "3d") && !overlay && (
-        <nav aria-label="Stations" className={`absolute flex justify-between gap-1 rounded-sm bg-[#1b1611]/90 p-1 ${vp.w < 700 ? "inset-x-2 bottom-10" : "bottom-14 left-4"}`}>
+      {(vp.w < 700 || mode === "3d") && !overlay && !(intro && !c) && (
+        <nav aria-label="Stations" className={`absolute flex justify-between gap-1 rounded-sm bg-[#1b1611]/90 p-1 ${vp.w < 700 ? "inset-x-2 bottom-4" : "bottom-4 left-4"}`}>
           {([["overview", "Room"], ["table", "Table"], ["wall", "Wall"], ["investigator", "Invest."], ["prosecutor", "Prosec."], ["defender", "Defence"]] as [Focus, string][]).filter(([f]) => f !== "overview" || mode === "3d").map(([f, l]) => (
-            <button key={f} onClick={() => go(f, f === "table" || f === "wall" || f === "overview" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-2.5 py-2 text-[15px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper/80"}`}>{l}</button>
+            <button key={f} onClick={() => go(f, f === "table" || f === "wall" || f === "overview" ? null : { kind: "agent", role: f as Advocate })} className={`hint flex-1 rounded-sm px-2.5 py-2 text-[15px] ${focus === f ? "bg-[#e8dcbf] text-[#2b241c]" : "text-paper"}`}>{l}</button>
           ))}
+          {mode === "3d" && vp.w >= 700 && (
+            <>
+              <span className="mx-1 w-px self-stretch bg-white/20" aria-hidden />
+              {c && onTextView && <button onClick={onTextView} className="hint rounded-sm px-2.5 py-2 text-[15px] text-paper hover:bg-white/10">Text</button>}
+              <a href={(() => { const p = new URLSearchParams(location.search); p.set("view", "2d"); return `?${p.toString().replace("demo=", "demo")}`; })()} className="hint rounded-sm px-2.5 py-2 text-[15px] text-paper hover:bg-white/10">2D</a>
+            </>
+          )}
         </nav>
       )}
       {mode === "3d" && focus === "wall" && !overlay && c && (c.evidence.length > 0 || c.verdicts.length > 0) && (
@@ -263,40 +272,44 @@ function Tag({ x, y, text, small }: { x: number; y: number; text: string; small?
   );
 }
 
-const BREAKING = [
-  "Serbia: early parliamentary elections held 25 October · OSCE/ODIHR preliminary findings published 26 October",
-  "United States: federal general election, Tuesday 3 November 2026",
-  "South Africa: local government elections, 4 November 2026 · new Disinformation Code in force",
-];
-
-/** The opening moment: what this is, why now, and two ways in. */
+/**
+ * The cold open. The camera is already in the newsroom, tight on the live election board; the
+ * overlay is a broadcast frame (letterbox, a live bug, a lower third), not a landing page. Entering
+ * retracts the frame while the camera dollies back into the room.
+ */
 function Intro({ onEnter, onDemo }: { onEnter: () => void; onDemo: () => void }) {
-  const line = BREAKING.join("    ●    ");
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => { const iv = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(iv); }, []);
+  useEffect(() => { const k = (e: KeyboardEvent) => { if (e.key === "Enter") onEnter(); }; addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [onEnter]);
+  const bar = "absolute inset-x-0 bg-[#0b0c0d]";
   return (
-    <motion.section role="dialog" aria-label="The Ground Truth: Election Desk" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.6 } }}
-      className="absolute inset-0 z-40 flex flex-col" style={{ background: "linear-gradient(90deg, rgba(14,18,24,.92) 0%, rgba(14,18,24,.78) 45%, rgba(14,18,24,.35) 75%, rgba(14,18,24,.5) 100%)" }}>
-      <div className="flex items-stretch bg-[#c0392b] text-white">
-        <span className="flex items-center gap-2 bg-[#8e2318] px-4 py-2 font-mono text-[15px] font-bold tracking-widest"><span className="breaking-dot size-2.5 rounded-full bg-white" />BREAKING</span>
-        <div className="relative flex-1 overflow-hidden py-2"><div className="ticker-run flex w-max whitespace-nowrap font-mono text-[15px]"><span className="pr-16">{line}</span><span className="pr-16">{line}</span></div></div>
-      </div>
-      <div className="flex flex-1 items-center px-6 sm:px-14">
-        <div className="max-w-[880px]">
-          <motion.p initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="font-mono text-[15px] tracking-[0.2em] text-[#e0b04f]">ELECTION DESK · OCTOBER–NOVEMBER 2026</motion.p>
-          <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }} className="mt-3 font-serif text-[clamp(52px,8vw,112px)] font-semibold leading-[0.95] text-[#f7f1e3]">The Ground Truth</motion.h1>
-          <motion.p initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mt-5 max-w-[42ch] text-[clamp(19px,2vw,24px)] leading-snug text-[#e9e4d8]">
-            Three elections in ten days. Step into the newsroom, put a claim on trial, and direct three AI reporters as they investigate it in parallel. A judge rules only on verified evidence.
-          </motion.p>
-          <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap gap-3">
-            <button onClick={onEnter} className="bg-[#f7f1e3] px-6 py-3.5 text-[17px] font-semibold text-[#14110d] hover:bg-[#e0b04f]">Enter the newsroom</button>
-            <button onClick={onDemo} className="border-2 border-[#f7f1e3] px-6 py-3 text-[17px] font-semibold text-[#f7f1e3] hover:bg-white/10">Watch the Serbia investigation <span className="font-normal opacity-80">(recorded)</span></button>
-          </motion.div>
-          <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-10 grid max-w-[760px] gap-3 sm:grid-cols-3">
-            {[["Serbia", "Voted 25 October"], ["United States", "Votes 3 November"], ["South Africa", "Votes 4 November"]].map(([k, v]) => (
-              <li key={k} className="border-l-4 border-[#c0392b] bg-black/30 px-4 py-3"><p className="font-serif text-[22px] text-white">{k}</p><p className="font-mono text-[14px] text-[#e0b04f]">{v}</p></li>
-            ))}
-          </motion.ul>
+    <motion.section role="dialog" aria-label="The Ground Truth: Election Desk" className="absolute inset-0 z-40" initial="in" animate="in" exit="out">
+      {/* letterbox */}
+      <motion.div className={`${bar} top-0`} variants={{ in: { height: "11vh" }, out: { height: 0, transition: { duration: 1.1, ease: [0.7, 0, 0.2, 1] } } }} initial={{ height: "50vh" }} animate={{ height: "11vh", transition: { duration: 1.4, ease: [0.7, 0, 0.2, 1] } }}>
+        <div className="flex h-full items-end justify-between px-6 pb-3 sm:px-10">
+          <p className="flex items-center gap-2 font-mono text-[14px] tracking-[0.18em] text-white"><span className="rec inline-block size-2.5 rounded-full bg-[#e0352b]" />LIVE · ELECTION DESK</p>
+          <p className="font-mono text-[14px] tracking-[0.12em] text-white/80">{now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase()} · {now.toLocaleTimeString("en-GB")}</p>
         </div>
-      </div>
+      </motion.div>
+      <motion.div className={`${bar} bottom-0`} variants={{ in: { height: "11vh" }, out: { height: 0, transition: { duration: 1.1, ease: [0.7, 0, 0.2, 1] } } }} initial={{ height: "50vh" }} animate={{ height: "11vh", transition: { duration: 1.4, ease: [0.7, 0, 0.2, 1] } }} />
+      {/* a soft grade so the lower third reads over the board */}
+      <motion.div className="pointer-events-none absolute inset-0" variants={{ out: { opacity: 0, transition: { duration: 0.8 } } }} style={{ background: "radial-gradient(70% 60% at 0% 100%, rgba(8,10,12,.85) 0%, rgba(8,10,12,.45) 45%, transparent 75%)" }} />
+      {/* lower third */}
+      <motion.div className="absolute bottom-[11vh] left-0 right-0 px-6 pb-8 sm:px-10"
+        variants={{ out: { opacity: 0, y: 24, transition: { duration: 0.5 } } }} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0, transition: { delay: 1.2, duration: 0.7 } }}>
+        <div className="flex max-w-[620px] flex-col gap-4">
+          <div className="border-l-[6px] border-[#e0352b] pl-5">
+            <h1 className="font-serif text-[clamp(40px,5vw,68px)] font-semibold leading-[0.9] text-[#f7f1e3]">The Ground Truth</h1>
+          </div>
+          <p className="max-w-[34ch] text-[19px] leading-snug text-white">Every election claim goes on trial. Three reporters investigate, you make the calls, a judge rules on the evidence.</p>
+        </div>
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <button onClick={onEnter} className="group inline-flex items-center gap-3 bg-[#f7f1e3] px-5 py-3 text-[17px] font-semibold text-[#111] hover:bg-[#f0c35a]">
+            Walk into the newsroom <span className="font-mono text-[13px] text-[#555] group-hover:text-[#111]">↵</span>
+          </button>
+          <button onClick={onDemo} className="text-[17px] text-white underline decoration-white/40 underline-offset-[6px] hover:decoration-white">Replay the Serbia investigation (recorded)</button>
+        </div>
+      </motion.div>
     </motion.section>
   );
 }
